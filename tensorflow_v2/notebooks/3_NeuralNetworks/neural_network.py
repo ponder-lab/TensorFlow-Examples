@@ -1,31 +1,31 @@
 # %%
-"""
-# Neural Network Example
+# """
+# # Neural Network Example
 
-Build a 2-hidden layers fully connected neural network (a.k.a multilayer perceptron) with TensorFlow v2.
+# Build a 2-hidden layers fully connected neural network (a.k.a multilayer perceptron) with TensorFlow v2.
 
-This example is using a low-level approach to better understand all mechanics behind building neural networks and the training process.
+# This example is using a low-level approach to better understand all mechanics behind building neural networks and the training process.
 
-- Author: Aymeric Damien
-- Project: https://github.com/aymericdamien/TensorFlow-Examples/
-"""
+# - Author: Aymeric Damien
+# - Project: https://github.com/aymericdamien/TensorFlow-Examples/
+# """
 
 # %%
-"""
-## Neural Network Overview
+# """
+# ## Neural Network Overview
 
-<img src="http://cs231n.github.io/assets/nn1/neural_net2.jpeg" alt="nn" style="width: 400px;"/>
+# <img src="http://cs231n.github.io/assets/nn1/neural_net2.jpeg" alt="nn" style="width: 400px;"/>
 
-## MNIST Dataset Overview
+# ## MNIST Dataset Overview
 
-This example is using MNIST handwritten digits. The dataset contains 60,000 examples for training and 10,000 examples for testing. The digits have been size-normalized and centered in a fixed-size image (28x28 pixels) with values from 0 to 255.
+# This example is using MNIST handwritten digits. The dataset contains 60,000 examples for training and 10,000 examples for testing. The digits have been size-normalized and centered in a fixed-size image (28x28 pixels) with values from 0 to 255.
 
-In this example, each image will be converted to float32, normalized to [0, 1] and flattened to a 1-D array of 784 features (28*28).
+# In this example, each image will be converted to float32, normalized to [0, 1] and flattened to a 1-D array of 784 features (28*28).
 
-![MNIST Dataset](http://neuralnetworksanddeeplearning.com/images/mnist_100_digits.png)
+# ![MNIST Dataset](http://neuralnetworksanddeeplearning.com/images/mnist_100_digits.png)
 
-More info: http://yann.lecun.com/exdb/mnist/
-"""
+# More info: http://yann.lecun.com/exdb/mnist/
+# """
 
 # %%
 from __future__ import absolute_import, division, print_function
