@@ -32,6 +32,7 @@ from __future__ import absolute_import, division, print_function
 
 import tensorflow as tf
 print("TensorFlow version:", tf.__version__)
+assert(tf.__version__ == "2.15.0")
 from tensorflow.keras import Model, layers
 import numpy as np
 import timeit
