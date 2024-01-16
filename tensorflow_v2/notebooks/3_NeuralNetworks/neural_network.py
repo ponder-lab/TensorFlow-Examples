@@ -34,6 +34,10 @@ import tensorflow as tf
 print("TensorFlow version:", tf.__version__)
 from tensorflow.keras import Model, layers
 import numpy as np
+import timeit
+
+start_time = timeit.default_timer()
+skipped_time = 0
 
 # %%
 # MNIST dataset parameters.
@@ -142,12 +146,16 @@ for step, (batch_x, batch_y) in enumerate(train_data.take(training_steps), 1):
         pred = neural_net(batch_x, is_training=True)
         loss = cross_entropy_loss(pred, batch_y)
         acc = accuracy(pred, batch_y)
+        print_time = timeit.default_timer()
         print("step: %i, loss: %f, accuracy: %f" % (step, loss, acc))
+        skipped_time += timeit.default_timer() - print_time
 
 # %%
 # Test model on validation set.
 pred = neural_net(x_test, is_training=False)
+print_time = timeit.default_timer()
 print("Test Accuracy: %f" % accuracy(pred, y_test))
+skipped_time += timeit.default_timer() - print_time
 
 # %%
 # Visualize predictions.
@@ -158,6 +166,8 @@ import matplotlib.pyplot as plt
 n_images = 5
 test_images = x_test[:n_images]
 predictions = neural_net(test_images)
+
+print("Elapsed time: ", timeit.default_timer() - start_time - skipped_time)
 
 # Display image and model prediction.
 for i in range(n_images):
