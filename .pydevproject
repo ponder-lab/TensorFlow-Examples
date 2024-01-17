@@ -1,20 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?eclipse-pydev version="1.0"?><pydev_project>
+        
     <pydev_property name="org.python.pydev.PYTHON_PROJECT_VERSION">python interpreter</pydev_property>
+        
     <pydev_property name="org.python.pydev.PYTHON_PROJECT_INTERPRETER">Default</pydev_property>
+        
     <pydev_pathproperty name="org.python.pydev.PROJECT_SOURCE_PATH">
-        <path>/${PROJECT_DIR_NAME}/examples/1_Introduction</path>
-        <path>/${PROJECT_DIR_NAME}/examples/2_BasicModels</path>
-        <path>/${PROJECT_DIR_NAME}/examples/3_NeuralNetworks</path>
-        <path>/${PROJECT_DIR_NAME}/examples/4_Utils</path>
-        <path>/${PROJECT_DIR_NAME}/examples/5_DataManagement</path>
-        <path>/${PROJECT_DIR_NAME}/examples/6_MultiGPU</path>
-        <path>/${PROJECT_DIR_NAME}/tensorflow_v1/examples/1_Introduction</path>
-        <path>/${PROJECT_DIR_NAME}/tensorflow_v1/examples/2_BasicModels</path>
-        <path>/${PROJECT_DIR_NAME}/tensorflow_v1/examples/3_NeuralNetworks</path>
-        <path>/${PROJECT_DIR_NAME}/tensorflow_v1/examples/4_Utils</path>
-        <path>/${PROJECT_DIR_NAME}/tensorflow_v1/examples/5_DataManagement</path>
-        <path>/${PROJECT_DIR_NAME}/tensorflow_v1/examples/6_MultiGPU</path>
         <path>/${PROJECT_DIR_NAME}/tensorflow_v2/notebooks/3_NeuralNetworks</path>
     </pydev_pathproperty>
+    
 </pydev_project>
