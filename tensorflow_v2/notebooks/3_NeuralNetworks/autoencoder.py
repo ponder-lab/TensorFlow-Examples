@@ -32,6 +32,8 @@
 from __future__ import absolute_import, division, print_function
 
 import tensorflow as tf
+print("TensorFlow version:", tf.__version__)
+assert(tf.__version__ == "2.9.3")
 import numpy as np
 
 # %%
