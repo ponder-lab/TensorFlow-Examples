@@ -40,6 +40,8 @@ import csv
 from os.path import relpath
 import platform
 
+import timeit
+
 # %%
 # MNIST dataset parameters.
 num_classes = 10 # total classes (0-9 digits).
@@ -97,6 +99,9 @@ class BiRNN(Model):
             x = tf.nn.softmax(x)
         return x
 
+start_time = timeit.default_timer()
+skipped_time = 0
+
 # Build LSTM model.
 birnn_net = BiRNN()
 
@@ -139,6 +144,12 @@ def run_optimization(x, y):
     # Update W and b following gradients.
     optimizer.apply_gradients(zip(gradients, trainable_variables))
 
+total_loss = 0
+loss_count = 0
+
+total_accuracy = 0
+accuracy_count = 0
+
 # %%
 # Run training for the given number of steps.
 for step, (batch_x, batch_y) in enumerate(train_data.take(training_steps), 1):
@@ -148,11 +159,21 @@ for step, (batch_x, batch_y) in enumerate(train_data.take(training_steps), 1):
     if step % display_step == 0:
         pred = birnn_net(batch_x, is_training=True)
         loss = cross_entropy_loss(pred, batch_y)
+        total_loss += loss
+        loss_count += 1
         acc = accuracy(pred, batch_y)
+        total_accuracy += acc
+        accuracy_count += 1
+        print_time = timeit.default_timer()
         print("step: %i, loss: %f, accuracy: %f" % (step, loss, acc))
+        skipped_time += timeit.default_timer() - print_time
+
+time = timeit.default_timer() - start_time - skipped_time
+avg_loss = float(total_loss) / float(loss_count)
+avg_accuracy = float(total_accuracy)/ float(accuracy_count)
 
 OUTPUT_FILE = "runs.csv"
 
 with open(OUTPUT_FILE, 'a', newline='') as f:
     writer = csv.writer(f, "unix")
-    writer.writerow([relpath(__file__), platform.python_version(), tf.__version__, training_steps])
+    writer.writerow([relpath(__file__), platform.python_version(), tf.__version__, training_steps, avg_accuracy, avg_loss, time])
