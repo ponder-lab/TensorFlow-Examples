@@ -141,12 +141,17 @@ def run_optimization(x):
 
     return loss
 
+total_loss = 0
+loss_count = 0
+
 # %%
 # Run training for the given number of steps.
 for step, (batch_x, _) in enumerate(train_data.take(training_steps + 1)):
 
     # Run the optimization.
     loss = run_optimization(batch_x)
+    total_loss += loss
+    loss_count += 1
 
     if step % display_step == 0:
         print_time = timeit.default_timer()
@@ -179,6 +184,7 @@ for i, (batch_x, _) in enumerate(test_data.take(n)):
     skipped_time += timeit.default_timer() - viz_time
 
 print("Elapsed time: ", timeit.default_timer() - start_time - skipped_time)
+print("Average loss: %f" % (total_loss / float(loss_count)))
 
 print("Original Images")
 plt.figure(figsize=(n, n))
