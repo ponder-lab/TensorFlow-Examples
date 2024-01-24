@@ -36,6 +36,10 @@ import tensorflow as tf
 from tensorflow.keras import Model, layers
 import numpy as np
 
+import csv
+from os.path import relpath
+import platform
+
 # %%
 # MNIST dataset parameters.
 num_classes = 10 # total classes (0-9 digits).
@@ -146,3 +150,9 @@ for step, (batch_x, batch_y) in enumerate(train_data.take(training_steps), 1):
         loss = cross_entropy_loss(pred, batch_y)
         acc = accuracy(pred, batch_y)
         print("step: %i, loss: %f, accuracy: %f" % (step, loss, acc))
+
+OUTPUT_FILE = "runs.csv"
+
+with open(OUTPUT_FILE, 'a', newline='') as f:
+    writer = csv.writer(f, "unix")
+    writer.writerow([relpath(__file__), platform.python_version(), tf.__version__, training_steps])
