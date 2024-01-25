@@ -1,13 +1,14 @@
-# %%
 from __future__ import absolute_import, division, print_function
 from scripts.utils import write_csv
 import timeit
 
 # %%
 """
-# Bi-directional Recurrent Neural Network Example
+# Convolutional Neural Network Example
 
-Build a bi-directional recurrent neural network (LSTM) with TensorFlow 2.0.
+Build a convolutional neural network with TensorFlow v2.
+
+This example is using a low-level approach to better understand all mechanics behind building convolutional neural networks and the training process.
 
 - Author: Aymeric Damien
 - Project: https://github.com/aymericdamien/TensorFlow-Examples/
@@ -15,25 +16,23 @@ Build a bi-directional recurrent neural network (LSTM) with TensorFlow 2.0.
 
 # %%
 """
-## BiRNN Overview
+## CNN Overview
 
-<img src="https://ai2-s2-public.s3.amazonaws.com/figures/2016-11-08/191dd7df9cb91ac22f56ed0dfa4a5651e8767a51/1-Figure2-1.png" alt="nn" style="width: 600px;"/>
-
-References:
-- [Long Short Term Memory](http://deeplearning.cs.cmu.edu/pdfs/Hochreiter97_lstm.pdf), Sepp Hochreiter & Jurgen Schmidhuber, Neural Computation 9(8): 1735-1780, 1997.
+![CNN](http://personal.ie.cuhk.edu.hk/~ccloy/project_target_code/images/fig3.png)
 
 ## MNIST Dataset Overview
 
-This example is using MNIST handwritten digits. The dataset contains 60,000 examples for training and 10,000 examples for testing. The digits have been size-normalized and centered in a fixed-size image (28x28 pixels) with values from 0 to 1. For simplicity, each image has been flattened and converted to a 1-D numpy array of 784 features (28*28).
+This example is using MNIST handwritten digits. The dataset contains 60,000 examples for training and 10,000 examples for testing. The digits have been size-normalized and centered in a fixed-size image (28x28 pixels) with values from 0 to 255.
+
+In this example, each image will be converted to float32 and normalized to [0, 1].
 
 ![MNIST Dataset](http://neuralnetworksanddeeplearning.com/images/mnist_100_digits.png)
-
-To classify images using a recurrent neural network, we consider every image row as a sequence of pixels. Because MNIST image shape is 28*28px, we will then handle 28 sequences of 28 timesteps for every sample.
 
 More info: http://yann.lecun.com/exdb/mnist/
 """
 
-# Import TensorFlow v2.
+# %%
+
 import tensorflow as tf
 from tensorflow.keras import Model, layers
 import numpy as np
@@ -41,19 +40,17 @@ import numpy as np
 # %%
 # MNIST dataset parameters.
 num_classes = 10 # total classes (0-9 digits).
-num_features = 784 # data features (img shape: 28*28).
 
-# Training Parameters
+# Training parameters.
 learning_rate = 0.001
-training_steps = 1000
-batch_size = 32
-display_step = 100
+training_steps = 200
+batch_size = 128
+display_step = 10
 
-# Network Parameters
-# MNIST image shape is 28*28px, we will then handle 28 sequences of 28 timesteps for every sample.
-num_input = 28 # number of sequences.
-timesteps = 28 # timesteps.
-num_units = 32 # number of neurons for the LSTM layer.
+# Network parameters.
+conv1_filters = 32 # number of filters for 1st conv layer.
+conv2_filters = 64 # number of filters for 2nd conv layer.
+fc1_units = 1024 # number of neurons for 1st fully-connected layer.
 
 # %%
 # Prepare MNIST data.
@@ -61,8 +58,6 @@ from tensorflow.keras.datasets import mnist
 (x_train, y_train), (x_test, y_test) = mnist.load_data()
 # Convert to float32.
 x_train, x_test = np.array(x_train, np.float32), np.array(x_test, np.float32)
-# Flatten images to 1-D vector of 784 features (28*28).
-x_train, x_test = x_train.reshape([-1, 28, 28]), x_test.reshape([-1, num_features])
 # Normalize images value from [0, 255] to [0, 1].
 x_train, x_test = x_train / 255., x_test / 255.
 
@@ -71,24 +66,46 @@ x_train, x_test = x_train / 255., x_test / 255.
 train_data = tf.data.Dataset.from_tensor_slices((x_train, y_train))
 train_data = train_data.repeat().shuffle(5000).batch(batch_size).prefetch(1)
 
+start_time = timeit.default_timer()
+skipped_time = 0
+
 # %%
-# Create LSTM Model.
-class BiRNN(Model):
+# Create TF Model.
+class ConvNet(Model):
     # Set layers.
     def __init__(self):
-        super(BiRNN, self).__init__()
-        # Define 2 LSTM layers for forward and backward sequences.
-        lstm_fw = layers.LSTM(units=num_units)
-        lstm_bw = layers.LSTM(units=num_units, go_backwards=True)
-        # BiRNN layer.
-        self.bi_lstm = layers.Bidirectional(lstm_fw, backward_layer=lstm_bw)
-        # Output layer (num_classes).
+        super(ConvNet, self).__init__()
+        # Convolution Layer with 32 filters and a kernel size of 5.
+        self.conv1 = layers.Conv2D(32, kernel_size=5, activation=tf.nn.relu)
+        # Max Pooling (down-sampling) with kernel size of 2 and strides of 2.
+        self.maxpool1 = layers.MaxPool2D(2, strides=2)
+
+        # Convolution Layer with 64 filters and a kernel size of 3.
+        self.conv2 = layers.Conv2D(64, kernel_size=3, activation=tf.nn.relu)
+        # Max Pooling (down-sampling) with kernel size of 2 and strides of 2.
+        self.maxpool2 = layers.MaxPool2D(2, strides=2)
+
+        # Flatten the data to a 1-D vector for the fully connected layer.
+        self.flatten = layers.Flatten()
+
+        # Fully connected layer.
+        self.fc1 = layers.Dense(1024)
+        # Apply Dropout (if is_training is False, dropout is not applied).
+        self.dropout = layers.Dropout(rate=0.5)
+
+        # Output layer, class prediction.
         self.out = layers.Dense(num_classes)
 
     # Set forward pass.
-    @tf.function
     def call(self, x, is_training=False):
-        x = self.bi_lstm(x)
+        x = tf.reshape(x, [-1, 28, 28, 1])
+        x = self.conv1(x)
+        x = self.maxpool1(x)
+        x = self.conv2(x)
+        x = self.maxpool2(x)
+        x = self.flatten(x)
+        x = self.fc1(x)
+        x = self.dropout(x, training=is_training)
         x = self.out(x)
         if not is_training:
             # tf cross entropy expect logits without softmax, so only
@@ -96,16 +113,12 @@ class BiRNN(Model):
             x = tf.nn.softmax(x)
         return x
 
-start_time = timeit.default_timer()
-skipped_time = 0
-
-# Build LSTM model.
-birnn_net = BiRNN()
+# Build neural network model.
+conv_net = ConvNet()
 
 # %%
 # Cross-Entropy Loss.
 # Note that this will apply 'softmax' to the logits.
-@tf.function
 def cross_entropy_loss(x, y):
     # Convert labels to int 64 for tf cross-entropy function.
     y = tf.cast(y, tf.int64)
@@ -115,28 +128,26 @@ def cross_entropy_loss(x, y):
     return tf.reduce_mean(loss)
 
 # Accuracy metric.
-@tf.function
 def accuracy(y_pred, y_true):
     # Predicted class is the index of highest score in prediction vector (i.e. argmax).
     correct_prediction = tf.equal(tf.argmax(y_pred, 1), tf.cast(y_true, tf.int64))
     return tf.reduce_mean(tf.cast(correct_prediction, tf.float32), axis=-1)
 
-# Adam optimizer.
+# Stochastic gradient descent optimizer.
 optimizer = tf.optimizers.Adam(learning_rate)
 
 # %%
 # Optimization process.
-@tf.function
 def run_optimization(x, y):
     # Wrap computation inside a GradientTape for automatic differentiation.
     with tf.GradientTape() as g:
         # Forward pass.
-        pred = birnn_net(x, is_training=True)
+        pred = conv_net(x, is_training=True)
         # Compute loss.
         loss = cross_entropy_loss(pred, y)
 
     # Variables to update, i.e. trainable variables.
-    trainable_variables = birnn_net.trainable_variables
+    trainable_variables = conv_net.trainable_variables
 
     # Compute gradients.
     gradients = g.gradient(loss, trainable_variables)
@@ -157,7 +168,7 @@ for step, (batch_x, batch_y) in enumerate(train_data.take(training_steps), 1):
     run_optimization(batch_x, batch_y)
 
     if step % display_step == 0:
-        pred = birnn_net(batch_x, is_training=True)
+        pred = conv_net(batch_x)
         loss = cross_entropy_loss(pred, batch_y)
         total_loss += loss
         loss_count += 1
@@ -168,8 +179,31 @@ for step, (batch_x, batch_y) in enumerate(train_data.take(training_steps), 1):
         print("step: %i, loss: %f, accuracy: %f" % (step, loss, acc))
         skipped_time += timeit.default_timer() - print_time
 
+# %%
+# Test model on validation set.
+pred = conv_net(x_test)
+print_time = timeit.default_timer()
+print("Test Accuracy: %f" % accuracy(pred, y_test))
+skipped_time += timeit.default_timer() - print_time
+
+# %%
+# Visualize predictions.
+import matplotlib.pyplot as plt
+
+# %%
+# Predict 5 images from validation set.
+n_images = 5
+test_images = x_test[:n_images]
+predictions = conv_net(test_images)
+
 time = timeit.default_timer() - start_time - skipped_time
 avg_loss = float(total_loss) / float(loss_count)
 avg_accuracy = float(total_accuracy)/ float(accuracy_count)
+
+# Display image and model prediction.
+for i in range(n_images):
+    plt.imshow(np.reshape(test_images[i], [28, 28]), cmap='gray')
+    plt.show()
+    print("Model prediction: %i" % np.argmax(predictions.numpy()[i]))
 
 write_csv(__file__, training_steps, avg_accuracy, avg_loss, time)
