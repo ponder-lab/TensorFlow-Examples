@@ -1,5 +1,7 @@
 # %%
 from __future__ import absolute_import, division, print_function
+from scripts.utils import write_csv
+import timeit
 
 # %%
 """
@@ -35,18 +37,6 @@ More info: http://yann.lecun.com/exdb/mnist/
 import tensorflow as tf
 from tensorflow.keras import Model, layers
 import numpy as np
-
-import csv
-from os.path import relpath
-import platform
-from pygit2 import Repository
-
-import timeit
-
-def write_csv(output_file, source_file, epochs, accuracy, loss, time):
-    with open(output_file, 'a', newline='') as f:
-        writer = csv.writer(f, "unix")
-        writer.writerow([relpath(source_file), Repository(source_file).head.shorthand, platform.python_version(), tf.__version__, epochs, accuracy, loss, time])
 
 # %%
 # MNIST dataset parameters.
