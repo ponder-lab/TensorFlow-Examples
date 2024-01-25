@@ -43,6 +43,11 @@ from pygit2 import Repository
 
 import timeit
 
+def write_csv(output_file, source_file, epochs, accuracy, loss, time):
+    with open(output_file, 'a', newline='') as f:
+        writer = csv.writer(f, "unix")
+        writer.writerow([relpath(source_file), Repository(source_file).head.shorthand, platform.python_version(), tf.__version__, epochs, accuracy, loss, time])
+
 # %%
 # MNIST dataset parameters.
 num_classes = 10 # total classes (0-9 digits).
@@ -175,6 +180,4 @@ avg_accuracy = float(total_accuracy)/ float(accuracy_count)
 
 OUTPUT_FILE = "runs.csv"
 
-with open(OUTPUT_FILE, 'a', newline='') as f:
-    writer = csv.writer(f, "unix")
-    writer.writerow([relpath(__file__), Repository(__file__).head.shorthand, platform.python_version(), tf.__version__, training_steps, avg_accuracy, avg_loss, time])
+write_csv(OUTPUT_FILE, __file__, training_steps, avg_accuracy, avg_loss, time)
