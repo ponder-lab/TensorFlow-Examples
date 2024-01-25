@@ -168,6 +168,4 @@ time = timeit.default_timer() - start_time - skipped_time
 avg_loss = float(total_loss) / float(loss_count)
 avg_accuracy = float(total_accuracy)/ float(accuracy_count)
 
-OUTPUT_FILE = "runs.csv"
-
-write_csv(OUTPUT_FILE, __file__, training_steps, avg_accuracy, avg_loss, time)
+write_csv(__file__, training_steps, avg_accuracy, avg_loss, time)
