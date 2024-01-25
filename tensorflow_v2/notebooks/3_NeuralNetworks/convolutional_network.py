@@ -43,7 +43,7 @@ num_classes = 10 # total classes (0-9 digits).
 
 # Training parameters.
 learning_rate = 0.001
-training_steps = 200
+training_steps = 2000
 batch_size = 128
 display_step = 10
 
