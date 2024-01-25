@@ -39,6 +39,7 @@ import numpy as np
 import csv
 from os.path import relpath
 import platform
+from pygit2 import Repository
 
 import timeit
 
@@ -176,4 +177,4 @@ OUTPUT_FILE = "runs.csv"
 
 with open(OUTPUT_FILE, 'a', newline='') as f:
     writer = csv.writer(f, "unix")
-    writer.writerow([relpath(__file__), platform.python_version(), tf.__version__, training_steps, avg_accuracy, avg_loss, time])
+    writer.writerow([relpath(__file__), Repository(__file__).head.shorthand, platform.python_version(), tf.__version__, training_steps, avg_accuracy, avg_loss, time])
