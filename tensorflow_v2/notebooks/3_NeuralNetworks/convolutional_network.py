@@ -198,7 +198,7 @@ predictions = conv_net(test_images)
 
 time = timeit.default_timer() - start_time - skipped_time
 avg_loss = float(total_loss) / float(loss_count)
-avg_accuracy = float(total_accuracy)/ float(accuracy_count)
+avg_accuracy = float(total_accuracy) / float(accuracy_count)
 
 write_csv(__file__, training_steps, avg_accuracy, avg_loss, time)
 
