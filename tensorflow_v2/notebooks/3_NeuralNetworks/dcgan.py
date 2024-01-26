@@ -1,4 +1,7 @@
 from __future__ import absolute_import, division, print_function
+from scripts.utils import write_csv
+import timeit
+
 # %%
 """
 # Deep Convolutional Generative Adversarial Network Example
@@ -64,6 +67,9 @@ x_train, x_test = x_train / 255., x_test / 255.
 # Use tf.data API to shuffle and batch data.
 train_data = tf.data.Dataset.from_tensor_slices((x_train, y_train))
 train_data = train_data.repeat().shuffle(10000).batch(batch_size).prefetch(1)
+
+start_time = timeit.default_timer()
+skipped_time = 0
 
 # %%
 # Create TF Model.
@@ -185,6 +191,12 @@ def run_optimization(real_images):
 
     return gen_loss, disc_loss
 
+total_gen_loss = 0
+gen_loss_count = 0
+
+total_disc_loss = 0
+disc_loss_count = 0
+
 # %%
 # Run training for the given number of steps.
 for step, (batch_x, _) in enumerate(train_data.take(training_steps + 1)):
@@ -193,15 +205,33 @@ for step, (batch_x, _) in enumerate(train_data.take(training_steps + 1)):
         # Generate noise.
         noise = np.random.normal(-1., 1., size=[batch_size, noise_dim]).astype(np.float32)
         gen_loss = generator_loss(discriminator(generator(noise)))
+        total_gen_loss += gen_loss
+        gen_loss_count += 1
         disc_loss = discriminator_loss(discriminator(batch_x), discriminator(generator(noise)))
+        total_disc_loss += disc_loss
+        disc_loss_count += 1
+        print_time = timeit.default_timer()
         print("initial: gen_loss: %f, disc_loss: %f" % (gen_loss, disc_loss))
+        skipped_time += timeit.default_timer() - print_time
         continue
 
     # Run the optimization.
     gen_loss, disc_loss = run_optimization(batch_x)
+    total_gen_loss += gen_loss
+    gen_loss_count += 1
+    total_disc_loss += disc_loss
+    disc_loss_count += 1
 
     if step % display_step == 0:
+        print_time = timeit.default_timer()
         print("step: %i, gen_loss: %f, disc_loss: %f" % (step, gen_loss, disc_loss))
+        skipped_time += timeit.default_timer() - print_time
+
+time = timeit.default_timer() - start_time - skipped_time
+avg_gen_loss = float(total_gen_loss) / float(gen_loss_count)
+avg_disc_loss = float(total_disc_loss) / float(disc_loss_count)
+
+write_csv(__file__, training_steps, None, (avg_gen_loss + avg_disc_loss) / 2.0, time)
 
 # %%
 # Visualize predictions.
