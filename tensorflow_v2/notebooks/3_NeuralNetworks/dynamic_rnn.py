@@ -1,4 +1,7 @@
 from __future__ import absolute_import, division, print_function
+from scripts.utils import write_csv
+import timeit
+
 # %%
 """
 # Dynamic Recurrent Neural Network.
@@ -91,6 +94,9 @@ def toy_sequence_data():
 train_data = tf.data.Dataset.from_generator(toy_sequence_data, output_types=(tf.float32, tf.float32))
 train_data = train_data.repeat().shuffle(5000).batch(batch_size).prefetch(1)
 
+start_time = timeit.default_timer()
+skipped_time = 0
+
 # %%
 # Create LSTM Model.
 class LSTM(Model):
@@ -163,6 +169,12 @@ def run_optimization(x, y):
     # Update weights following gradients.
     optimizer.apply_gradients(zip(gradients, trainable_variables))
 
+total_loss = 0
+loss_count = 0
+
+total_accuracy = 0
+accuracy_count = 0
+
 # %%
 # Run training for the given number of steps.
 for step, (batch_x, batch_y) in enumerate(train_data.take(training_steps), 1):
@@ -172,5 +184,17 @@ for step, (batch_x, batch_y) in enumerate(train_data.take(training_steps), 1):
     if step % display_step == 0 or step == 1:
         pred = lstm_net(batch_x, is_training=True)
         loss = cross_entropy_loss(pred, batch_y)
+        total_loss += loss
+        loss_count += 1
         acc = accuracy(pred, batch_y)
+        total_accuracy += acc
+        accuracy_count += 1
+        print_time = timeit.default_timer()
         print("step: %i, loss: %f, accuracy: %f" % (step, loss, acc))
+        skipped_time += timeit.default_timer() - print_time
+
+time = timeit.default_timer() - start_time - skipped_time
+avg_loss = float(total_loss) / float(loss_count)
+avg_accuracy = float(total_accuracy) / float(accuracy_count)
+
+write_csv(__file__, training_steps, avg_accuracy, avg_loss, time)
