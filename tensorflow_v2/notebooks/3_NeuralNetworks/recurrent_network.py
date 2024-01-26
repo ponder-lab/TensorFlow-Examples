@@ -45,7 +45,7 @@ num_features = 784 # data features (img shape: 28*28).
 
 # Training Parameters
 learning_rate = 0.001
-training_steps = 2000
+training_steps = 3000
 batch_size = 32
 display_step = 100
 
