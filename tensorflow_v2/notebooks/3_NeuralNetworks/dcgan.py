@@ -47,9 +47,9 @@ num_features = 784 # data features (img shape: 28*28).
 # Training parameters.
 lr_generator = 0.0002
 lr_discriminator = 0.0002
-training_steps = 20000
+training_steps = 500
 batch_size = 128
-display_step = 500
+display_step = 5
 
 # Network parameters.
 noise_dim = 100 # Noise data points.
