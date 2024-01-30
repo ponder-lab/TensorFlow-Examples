@@ -1,12 +1,22 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?eclipse-pydev version="1.0"?><pydev_project>
-        
+            
+    
     <pydev_property name="org.python.pydev.PYTHON_PROJECT_VERSION">python interpreter</pydev_property>
-        
+            
+    
     <pydev_property name="org.python.pydev.PYTHON_PROJECT_INTERPRETER">Default</pydev_property>
-        
+            
+    
     <pydev_pathproperty name="org.python.pydev.PROJECT_SOURCE_PATH">
         <path>/${PROJECT_DIR_NAME}/tensorflow_v2/notebooks/3_NeuralNetworks</path>
+        <path>/${PROJECT_DIR_NAME}/tensorflow_v2/notebooks/0_Prerequisite</path>
+        <path>/${PROJECT_DIR_NAME}/tensorflow_v2/notebooks/1_Introduction</path>
+        <path>/${PROJECT_DIR_NAME}/tensorflow_v2/notebooks/2_BasicModels</path>
+        <path>/${PROJECT_DIR_NAME}/tensorflow_v2/notebooks/4_Utils</path>
+        <path>/${PROJECT_DIR_NAME}/tensorflow_v2/notebooks/5_DataManagement</path>
+        <path>/${PROJECT_DIR_NAME}/tensorflow_v2/notebooks/6_Hardware</path>
     </pydev_pathproperty>
-    
+        
+
 </pydev_project>
