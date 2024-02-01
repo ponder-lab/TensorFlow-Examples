@@ -15,6 +15,9 @@ import tensorflow as tf
 from tensorflow.keras import Model, layers
 import numpy as np
 
+from scripts.utils import write_csv
+import timeit
+
 # %%
 # MNIST dataset parameters.
 num_classes = 10 # 0 to 9 digits
@@ -53,13 +56,13 @@ Build a custom layer with inner-variables.
 # Create a custom layer, extending TF 'Layer' class.
 # Layer compute: y = relu(W * x + b)
 class CustomLayer1(layers.Layer):
-    
+
     # Layer arguments.
     def __init__(self, num_units, **kwargs):
         # Store the number of units (neurons).
         self.num_units = num_units
         super(CustomLayer1, self).__init__(**kwargs)
-        
+
     def build(self, input_shape):
         # Note: a custom layer can also include any other TF 'layers'.
         shape = tf.TensorShape((input_shape[1], self.num_units))
@@ -94,18 +97,18 @@ Build another custom layer with inner TF 'layers'.
 # Create a custom layer, extending TF 'Layer' class.
 # Custom layer: 2 Fully-Connected layers with residual connection.
 class CustomLayer2(layers.Layer):
-    
+
     # Layer arguments.
     def __init__(self, num_units, **kwargs):
         self.num_units = num_units
         super(CustomLayer2, self).__init__(**kwargs)
-        
+
     def build(self, input_shape):
         shape = tf.TensorShape((input_shape[1], self.num_units))
-        
+
         self.inner_layer1 = layers.Dense(1)
         self.inner_layer2 = layers.Dense(self.num_units)
-        
+
         # Make sure to call the `build` method at the end
         super(CustomLayer2, self).build(input_shape)
 
@@ -128,7 +131,7 @@ class CustomLayer2(layers.Layer):
 # %%
 # Create TF Model.
 class CustomNet(Model):
-    
+
     def __init__(self):
         super(CustomNet, self).__init__()
         # Use custom layers created above.
@@ -146,6 +149,9 @@ class CustomNet(Model):
             # apply softmax when not training.
             x = tf.nn.softmax(x)
         return x
+
+start_time = timeit.default_timer()
+skipped_time = 0
 
 # Build neural network model.
 custom_net = CustomNet()
@@ -167,7 +173,7 @@ def accuracy(y_pred, y_true):
 optimizer = tf.optimizers.Adam(learning_rate)
 
 # %%
-# Optimization process. 
+# Optimization process.
 def run_optimization(x, y):
     # Wrap computation inside a GradientTape for automatic differentiation.
     with tf.GradientTape() as g:
@@ -180,14 +186,32 @@ def run_optimization(x, y):
         # Update W and b following gradients.
         optimizer.apply_gradients(list(zip(gradients, custom_net.trainable_variables)))
 
+total_loss = 0
+loss_count = 0
+
+total_accuracy = 0
+accuracy_count = 0
+
 # %%
 # Run training for the given number of steps.
 for step, (batch_x, batch_y) in enumerate(train_data.take(training_steps), 1):
     # Run the optimization to update W and b values.
     run_optimization(batch_x, batch_y)
-    
+
     if step % display_step == 0:
         pred = custom_net(batch_x, is_training=False)
         loss = cross_entropy(pred, batch_y)
+        total_loss += loss
+        loss_count += 1
         acc = accuracy(pred, batch_y)
+        total_accuracy += acc
+        accuracy_count += 1
+        print_time = timeit.default_timer()
         print("step: %i, loss: %f, accuracy: %f" % (step, loss, acc))
+        skipped_time += timeit.default_timer() - print_time
+
+time = timeit.default_timer() - start_time - skipped_time
+avg_loss = float(total_loss) / float(loss_count)
+avg_accuracy = float(total_accuracy)/ float(accuracy_count)
+
+write_csv(__file__, training_steps, float(avg_accuracy), float(avg_loss), time)
