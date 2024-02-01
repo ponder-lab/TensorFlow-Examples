@@ -1,4 +1,6 @@
 from __future__ import absolute_import, division, print_function
+from scripts.utils import write_csv
+import timeit
 # %%
 """
 # Logistic Regression Example
@@ -56,6 +58,9 @@ x_train, x_test = x_train / 255., x_test / 255.
 train_data = tf.data.Dataset.from_tensor_slices((x_train, y_train))
 train_data = train_data.repeat().shuffle(5000).batch(batch_size).prefetch(1)
 
+start_time = timeit.default_timer()
+skipped_time = 0
+
 # %%
 # Weight of shape [784, 10], the 28*28 image features, and total number of classes.
 W = tf.Variable(tf.ones([num_features, num_classes]), name="weight")
@@ -99,6 +104,12 @@ def run_optimization(x, y):
     # Update W and b following gradients.
     optimizer.apply_gradients(zip(gradients, [W, b]))
 
+total_loss = 0
+loss_count = 0
+
+total_accuracy = 0
+accuracy_count = 0
+
 # %%
 # Run training for the given number of steps.
 for step, (batch_x, batch_y) in enumerate(train_data.take(training_steps), 1):
@@ -108,13 +119,21 @@ for step, (batch_x, batch_y) in enumerate(train_data.take(training_steps), 1):
     if step % display_step == 0:
         pred = logistic_regression(batch_x)
         loss = cross_entropy(pred, batch_y)
+        total_loss += loss
+        loss_count += 1
         acc = accuracy(pred, batch_y)
+        total_accuracy += acc
+        accuracy_count += 1
+        print_time = timeit.default_timer()
         print("step: %i, loss: %f, accuracy: %f" % (step, loss, acc))
+        skipped_time += timeit.default_timer() - print_time
 
 # %%
 # Test model on validation set.
 pred = logistic_regression(x_test)
+print_time = timeit.default_timer()
 print("Test Accuracy: %f" % accuracy(pred, y_test))
+skipped_time += timeit.default_timer() - print_time
 
 # %%
 # Visualize predictions.
@@ -125,6 +144,12 @@ import matplotlib.pyplot as plt
 n_images = 5
 test_images = x_test[:n_images]
 predictions = logistic_regression(test_images)
+
+time = timeit.default_timer() - start_time - skipped_time
+avg_loss = float(total_loss) / float(loss_count)
+avg_accuracy = float(total_accuracy)/ float(accuracy_count)
+
+write_csv(__file__, training_steps, float(avg_accuracy), float(avg_loss), time)
 
 # Display image and model prediction.
 for i in range(n_images):
