@@ -25,7 +25,7 @@ num_features = 784 # 28*28
 
 # Training parameters.
 learning_rate = 0.01
-training_steps = 500
+training_steps = 5000
 batch_size = 256
 display_step = 50
 
