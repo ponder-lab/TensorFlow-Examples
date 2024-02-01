@@ -97,6 +97,7 @@ def neural_net(x):
 
 # %%
 # Cross-Entropy loss function.
+@tf.function
 def cross_entropy(y_pred, y_true):
     with tf.name_scope('CrossEntropyLoss'):
         # Encode label to a one hot vector.
@@ -107,6 +108,7 @@ def cross_entropy(y_pred, y_true):
         return tf.reduce_mean(-tf.reduce_sum(y_true * tf.math.log(y_pred)))
 
 # Accuracy metric.
+@tf.function
 def accuracy(y_pred, y_true):
     with tf.name_scope('Accuracy'):
         # Predicted class is the index of highest score in prediction vector (i.e. argmax).
@@ -119,6 +121,7 @@ with tf.name_scope('Optimizer'):
 
 # %%
 # Optimization process.
+@tf.function
 def run_optimization(x, y):
     # Wrap computation inside a GradientTape for automatic differentiation.
     with tf.GradientTape() as g:
@@ -136,6 +139,7 @@ def run_optimization(x, y):
 
 # %%
 # Visualize weights & biases as histogram in Tensorboard.
+@tf.function
 def summarize_weights(step):
     for w in weights:
         tf.summary.histogram(w.replace('_', '/'), weights[w], step=step)
