@@ -2,7 +2,7 @@
 """
 # Save & Restore a Model
 
-Save and Restore a model using TensorFlow v2. In this example, we will go over both low and high-level approaches: 
+Save and Restore a model using TensorFlow v2. In this example, we will go over both low and high-level approaches:
 - Low-level: TF Checkpoint.
 - High-level: TF Module/Model saver.
 
@@ -18,6 +18,9 @@ This example is using the MNIST database of handwritten digits as toy dataset
 
 import tensorflow as tf
 import numpy as np
+
+from scripts.utils import write_csv
+import timeit
 
 # %%
 # MNIST dataset parameters.
@@ -45,6 +48,9 @@ x_train, x_test = x_train / 255., x_test / 255.
 # Use tf.data API to shuffle and batch data.
 train_data = tf.data.Dataset.from_tensor_slices((x_train, y_train))
 train_data = train_data.repeat().shuffle(5000).batch(batch_size).prefetch(1)
+
+start_time = timeit.default_timer()
+skipped_time = 0
 
 # %%
 """
@@ -83,7 +89,7 @@ def accuracy(y_pred, y_true):
 optimizer = tf.optimizers.Adam(learning_rate)
 
 # %%
-# Optimization process. 
+# Optimization process.
 def run_optimization(x, y):
     # Wrap computation inside a GradientTape for automatic differentiation.
     with tf.GradientTape() as g:
@@ -96,17 +102,29 @@ def run_optimization(x, y):
         # Update W and b following gradients.
         optimizer.apply_gradients(list(zip(gradients, [W, b])))
 
+total_loss = 0
+loss_count = 0
+
+total_accuracy = 0
+accuracy_count = 0
+
 # %%
 # Run training for the given number of steps.
 for step, (batch_x, batch_y) in enumerate(train_data.take(training_steps), 1):
     # Run the optimization to update W and b values.
     run_optimization(batch_x, batch_y)
-    
+
     if step % display_step == 0:
         pred = logistic_regression(batch_x)
         loss = cross_entropy(pred, batch_y)
+        total_loss += loss
+        loss_count += 1
         acc = accuracy(pred, batch_y)
+        accuracy_count += 1
+        total_accuracy += acc
+        print_time = timeit.default_timer()
         print("step: %i, loss: %f, accuracy: %f" % (step, loss, acc))
+        skipped_time += timeit.default_timer() - print_time
 
 # %%
 """
@@ -216,7 +234,7 @@ def accuracy(y_pred, y_true):
 optimizer = tf.optimizers.Adam(learning_rate)
 
 # %%
-# Optimization process. 
+# Optimization process.
 def run_optimization(x, y):
     # Wrap computation inside a GradientTape for automatic differentiation.
     with tf.GradientTape() as g:
@@ -234,12 +252,18 @@ def run_optimization(x, y):
 for step, (batch_x, batch_y) in enumerate(train_data.take(training_steps), 1):
     # Run the optimization to update W and b values.
     run_optimization(batch_x, batch_y)
-    
+
     if step % display_step == 0:
         pred = neural_net(batch_x, is_training=False)
         loss = cross_entropy(pred, batch_y)
+        total_loss += loss
+        loss_count += 1
         acc = accuracy(pred, batch_y)
+        total_accuracy += acc
+        accuracy_count += 1
+        print_time = timeit.default_timer()
         print("step: %i, loss: %f, accuracy: %f" % (step, loss, acc))
+        skipped_time += timeit.default_timer() - print_time
 
 # %%
 """
@@ -248,20 +272,34 @@ for step, (batch_x, batch_y) in enumerate(train_data.take(training_steps), 1):
 
 # %%
 # Save TF model.
+save_time = timeit.default_timer()
 neural_net.save_weights(filepath="./tfmodel.ckpt")
+skipped_time += timeit.default_timer() - save_time
 
 # %%
 # Re-build neural network model with default values.
 neural_net = NeuralNet()
 # Test model performance.
 pred = neural_net(batch_x)
+print_time = timeit.default_timer()
 print("accuracy: %f" % accuracy(pred, batch_y))
+skipped_time += timeit.default_timer() - print_time
 
 # %%
 # Load saved weights.
+load_time = timeit.default_timer()
 neural_net.load_weights(filepath="./tfmodel.ckpt")
+skipped_time += timeit.default_timer() - load_time
 
 # %%
 # Test that weights loaded correctly.
 pred = neural_net(batch_x)
+print_time = timeit.default_timer()
 print("accuracy: %f" % accuracy(pred, batch_y))
+skipped_time += timeit.default_timer() - print_time
+
+time = timeit.default_timer() - start_time - skipped_time
+avg_loss = float(total_loss) / float(loss_count)
+avg_accuracy = float(total_accuracy)/ float(accuracy_count)
+
+write_csv(__file__, training_steps, float(avg_accuracy), float(avg_loss), time)
