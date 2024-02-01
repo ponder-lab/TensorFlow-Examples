@@ -13,6 +13,9 @@ Graph, Loss, Accuracy & Weights visualization using Tensorboard and TensorFlow v
 import tensorflow as tf
 import numpy as np
 
+from scripts.utils import write_csv
+import timeit
+
 # %%
 # Path to save logs into.
 logs_path = '/tmp/tensorflow_logs/example/'
@@ -46,6 +49,9 @@ x_train, x_test = x_train / 255., x_test / 255.
 # Use tf.data API to shuffle and batch data.
 train_data = tf.data.Dataset.from_tensor_slices((x_train, y_train))
 train_data = train_data.repeat().shuffle(5000).batch(batch_size).prefetch(1)
+
+start_time = timeit.default_timer()
+skipped_time = 0
 
 # %%
 # Store layers weight & bias
@@ -112,19 +118,19 @@ with tf.name_scope('Optimizer'):
     optimizer = tf.optimizers.SGD(learning_rate)
 
 # %%
-# Optimization process. 
+# Optimization process.
 def run_optimization(x, y):
     # Wrap computation inside a GradientTape for automatic differentiation.
     with tf.GradientTape() as g:
         pred = neural_net(x)
         loss = cross_entropy(pred, y)
-        
+
     # Variables to update, i.e. trainable variables.
     trainable_variables = list(weights.values()) + list(biases.values())
 
     # Compute gradients.
     gradients = g.gradient(loss, trainable_variables)
-    
+
     # Update weights/biases following gradients.
     optimizer.apply_gradients(list(zip(gradients, trainable_variables)))
 
@@ -140,18 +146,24 @@ def summarize_weights(step):
 # Create a Summary Writer to log the metrics to Tensorboad.
 summary_writer = tf.summary.create_file_writer(logs_path)
 
+total_loss = 0
+loss_count = 0
+
+total_accuracy = 0
+accuracy_count = 0
+
 # %%
 # Run training for the given number of steps.
 for step, (batch_x, batch_y) in enumerate(train_data.take(training_steps), 1):
-    
-    # Start to trace the computation graph. The computation graph remains 
+
+    # Start to trace the computation graph. The computation graph remains
     # the same at each step, so we just need to export it once.
     if step == 1:
         tf.summary.trace_on(graph=True, profiler=True)
-    
+
     # Run the optimization (computation graph).
     run_optimization(batch_x, batch_y)
-    
+
     # Export the computation graph to tensorboard after the first
     # computation step was performed.
     if step == 1:
@@ -164,16 +176,27 @@ for step, (batch_x, batch_y) in enumerate(train_data.take(training_steps), 1):
     if step % display_step == 0:
         pred = neural_net(batch_x)
         loss = cross_entropy(pred, batch_y)
+        total_loss += loss
+        loss_count += 1
         acc = accuracy(pred, batch_y)
+        total_accuracy += acc
+        accuracy_count += 1
+        print_time = timeit.default_timer()
         print("step: %i, loss: %f, accuracy: %f" % (step, loss, acc))
-        
-        # Write loss/acc metrics & weights to Tensorboard every few steps, 
+        skipped_time += timeit.default_timer() - print_time
+
+        # Write loss/acc metrics & weights to Tensorboard every few steps,
         # to avoid storing too much data.
         with summary_writer.as_default():
             tf.summary.scalar('loss', loss, step=step)
             tf.summary.scalar('accuracy', acc, step=step)
             summarize_weights(step)
 
+time = timeit.default_timer() - start_time - skipped_time
+avg_loss = float(total_loss) / float(loss_count)
+avg_accuracy = float(total_accuracy)/ float(accuracy_count)
+
+write_csv(__file__, training_steps, float(avg_accuracy), float(avg_loss), time)
 
 # %%
 """
