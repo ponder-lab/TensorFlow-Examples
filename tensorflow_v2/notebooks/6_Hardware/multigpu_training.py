@@ -35,6 +35,9 @@ from tensorflow.keras import Model, layers
 import time
 import numpy as np
 
+from scripts.utils import write_csv
+import timeit
+
 # %%
 # MNIST dataset parameters.
 num_classes = 10 # total classes (0-9 digits).
@@ -69,23 +72,26 @@ y_train, y_test = np.reshape(y_train, (-1)), np.reshape(y_test, (-1))
 train_data = tf.data.Dataset.from_tensor_slices((x_train, y_train))
 train_data = train_data.repeat().shuffle(batch_size * 10).batch(batch_size).prefetch(num_gpus)
 
+start_time = timeit.default_timer()
+skipped_time = 0
+
 # %%
 class ConvNet(Model):
     # Set layers.
     def __init__(self):
         super(ConvNet, self).__init__()
-        
+
         # Convolution Layer with 64 filters and a kernel size of 3.
         self.conv1_1 = layers.Conv2D(conv1_filters, kernel_size=3, padding='SAME', activation=tf.nn.relu)
         self.conv1_2 = layers.Conv2D(conv1_filters, kernel_size=3, padding='SAME', activation=tf.nn.relu)
-        # Max Pooling (down-sampling) with kernel size of 2 and strides of 2. 
+        # Max Pooling (down-sampling) with kernel size of 2 and strides of 2.
         self.maxpool1 = layers.MaxPool2D(2, strides=2)
 
         # Convolution Layer with 128 filters and a kernel size of 3.
         self.conv2_1 = layers.Conv2D(conv2_filters, kernel_size=3, padding='SAME', activation=tf.nn.relu)
         self.conv2_2 = layers.Conv2D(conv2_filters, kernel_size=3, padding='SAME', activation=tf.nn.relu)
         self.conv2_3 = layers.Conv2D(conv2_filters, kernel_size=3, padding='SAME', activation=tf.nn.relu)
-        # Max Pooling (down-sampling) with kernel size of 2 and strides of 2. 
+        # Max Pooling (down-sampling) with kernel size of 2 and strides of 2.
         self.maxpool2 = layers.MaxPool2D(2, strides=2)
 
         # Convolution Layer with 256 filters and a kernel size of 3.
@@ -145,7 +151,7 @@ def accuracy(y_pred, y_true):
     # Predicted class is the index of highest score in prediction vector (i.e. argmax).
     correct_prediction = tf.equal(tf.argmax(y_pred, 1), tf.cast(y_true, tf.int64))
     return tf.reduce_mean(tf.cast(correct_prediction, tf.float32), axis=-1)
-    
+
 
 @tf.function
 def backprop(batch_x, batch_y, trainable_variables):
@@ -168,12 +174,12 @@ def average_gradients(tower_grads):
         for g in tgrads:
             expanded_g = tf.expand_dims(g, 0)
             grads.append(expanded_g)
-        
+
         grad = tf.concat(axis=0, values=grads)
         grad = tf.reduce_mean(grad, 0)
-        
+
         avg_grads.append(grad)
-        
+
     return avg_grads
 
 # %%
@@ -197,12 +203,12 @@ def run_optimization(x, y):
             gpu_batch_size = int(batch_size/num_gpus)
             batch_x = x[i * gpu_batch_size: (i+1) * gpu_batch_size]
             batch_y = y[i * gpu_batch_size: (i+1) * gpu_batch_size]
-            
+
             # Build the neural net on each GPU.
             with tf.device('/gpu:%i' % i):
                 grad = backprop(batch_x, batch_y, trainable_variables)
                 tower_grads.append(grad)
-                    
+
                 # Last GPU Average gradients from all GPUs.
                 if i == num_gpus - 1:
                     gradients = average_gradients(tower_grads)
@@ -210,18 +216,36 @@ def run_optimization(x, y):
         # Update vars following gradients.
         optimizer.apply_gradients(list(zip(gradients, trainable_variables)))
 
+total_loss = 0
+loss_count = 0
+
+total_accuracy = 0
+accuracy_count = 0
+
 # %%
 # Run training for the given number of steps.
 ts = time.time()
 for step, (batch_x, batch_y) in enumerate(train_data.take(training_steps), 1):
     # Run the optimization to update W and b values.
     run_optimization(batch_x, batch_y)
-    
+
     if step % display_step == 0 or step == 1:
         dt = time.time() - ts
         speed = batch_size * display_step / dt
         pred = conv_net(batch_x)
         loss = cross_entropy_loss(pred, batch_y)
+        total_loss += loss
+        loss_count += 1
         acc = accuracy(pred, batch_y)
+        total_accuracy += acc
+        accuracy_count += 1
+        print_time = timeit.default_timer()
         print(("step: %i, loss: %f, accuracy: %f, speed: %f examples/sec" % (step, loss, acc, speed)))
+        skipped_time += timeit.default_timer() - print_time
         ts = time.time()
+
+time = timeit.default_timer() - start_time - skipped_time
+avg_loss = float(total_loss) / float(loss_count)
+avg_accuracy = float(total_accuracy)/ float(accuracy_count)
+
+write_csv(__file__, training_steps, float(avg_accuracy), float(avg_loss), time)
