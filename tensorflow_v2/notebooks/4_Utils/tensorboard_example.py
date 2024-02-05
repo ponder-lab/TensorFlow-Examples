@@ -139,7 +139,6 @@ def run_optimization(x, y):
 
 # %%
 # Visualize weights & biases as histogram in Tensorboard.
-@tf.function
 def summarize_weights(step):
     for w in weights:
         tf.summary.histogram(w.replace('_', '/'), weights[w], step=step)
