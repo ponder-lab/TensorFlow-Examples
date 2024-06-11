@@ -118,6 +118,7 @@ class Discriminator(Model):
         self.fc2 = layers.Dense(2)
 
     # Set forward pass.
+    @tf.function
     def call(self, x, is_training=False):
         x = tf.reshape(x, [-1, 28, 28, 1])
         x = self.conv1(x)
@@ -156,6 +157,7 @@ optimizer_disc = tf.optimizers.Adam(learning_rate=lr_discriminator)#, beta_1=0.5
 
 # %%
 # Optimization process. Inputs: real image and noise.
+@tf.function
 def run_optimization(real_images):
 
     # Rescale to [-1, 1], the input range of the discriminator

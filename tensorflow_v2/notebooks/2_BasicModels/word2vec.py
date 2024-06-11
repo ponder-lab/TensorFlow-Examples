@@ -136,6 +136,7 @@ def get_embedding(x):
         x_embed = tf.nn.embedding_lookup(embedding, x)
         return x_embed
 
+@tf.function
 def nce_loss(x_embed, y):
     with tf.device('/cpu:0'):
         # Compute the average NCE loss for the batch.
@@ -150,6 +151,7 @@ def nce_loss(x_embed, y):
         return loss
 
 # Evaluation.
+@tf.function
 def evaluate(x_embed):
     with tf.device('/cpu:0'):
         # Compute the cosine similarity between input data embedding and every embedding vectors

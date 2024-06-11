@@ -85,6 +85,7 @@ class NeuralNet(Model):
         self.out = layers.Dense(num_classes)
 
     # Set forward pass.
+    @tf.function
     def call(self, x, is_training=False):
         x = self.fc1(x)
         x = self.fc2(x)
@@ -101,6 +102,7 @@ neural_net = NeuralNet()
 # %%
 # Cross-Entropy Loss.
 # Note that this will apply 'softmax' to the logits.
+@tf.function
 def cross_entropy_loss(x, y):
     # Convert labels to int 64 for tf cross-entropy function.
     y = tf.cast(y, tf.int64)
@@ -110,6 +112,7 @@ def cross_entropy_loss(x, y):
     return tf.reduce_mean(loss)
 
 # Accuracy metric.
+@tf.function
 def accuracy(y_pred, y_true):
     # Predicted class is the index of highest score in prediction vector (i.e. argmax).
     correct_prediction = tf.equal(tf.argmax(y_pred, 1), tf.cast(y_true, tf.int64))
@@ -120,6 +123,7 @@ optimizer = tf.optimizers.SGD(learning_rate)
 
 # %%
 # Optimization process.
+@tf.function
 def run_optimization(x, y):
     # Wrap computation inside a GradientTape for automatic differentiation.
     with tf.GradientTape() as g:
