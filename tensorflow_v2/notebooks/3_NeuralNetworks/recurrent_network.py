@@ -142,9 +142,9 @@ def run_optimization(x, y):
     # Update weights following gradients.
     optimizer.apply_gradients(zip(gradients, trainable_variables))
 
-loss_accum = None
+loss_accum = 0
 loss_count = 0
-accuracy_accum = None
+accuracy_accum = 0
 accuracy_count = 0
 
 # %%
