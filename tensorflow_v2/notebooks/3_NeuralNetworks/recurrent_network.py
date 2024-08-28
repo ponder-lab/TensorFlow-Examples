@@ -103,7 +103,6 @@ lstm_net = LSTM()
 # %%
 # Cross-Entropy Loss.
 # Note that this will apply 'softmax' to the logits.
-@tf.function
 def cross_entropy_loss(x, y):
     # Convert labels to int 64 for tf cross-entropy function.
     y = tf.cast(y, tf.int64)
