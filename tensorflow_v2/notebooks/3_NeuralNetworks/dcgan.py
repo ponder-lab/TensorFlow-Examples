@@ -158,7 +158,6 @@ optimizer_disc = tf.optimizers.Adam(learning_rate=lr_discriminator)#, beta_1=0.5
 
 # %%
 # Optimization process. Inputs: real image and noise.
-@tf.function
 def run_optimization(real_images):
 
     # Rescale to [-1, 1], the input range of the discriminator
