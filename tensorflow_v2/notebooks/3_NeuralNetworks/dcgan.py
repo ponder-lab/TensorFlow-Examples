@@ -84,6 +84,7 @@ class Generator(Model):
         self.conv2tr2 = layers.Conv2DTranspose(1, 5, strides=2, padding='SAME')
 
     # Set forward pass.
+    @tf.function
     def call(self, x, is_training=False):
         x = self.fc1(x)
         x = self.bn1(x, training=is_training)
