@@ -257,4 +257,4 @@ for i in range(n):
 
 plt.figure(figsize=(n, n))
 plt.imshow(canvas, origin="upper", cmap="gray")
-plt.show()
+# plt.show()
