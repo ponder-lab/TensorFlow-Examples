@@ -142,8 +142,10 @@ def run_optimization(x, y):
     # Update weights following gradients.
     optimizer.apply_gradients(zip(gradients, trainable_variables))
 
-final_loss = None
-final_accuracy = None
+loss_accum = None
+loss_count = 0
+accuracy_accum = None
+accuracy_count = 0
 
 # %%
 # Run training for the given number of steps.
@@ -154,13 +156,15 @@ for step, (batch_x, batch_y) in enumerate(train_data.take(training_steps), 1):
     if step % display_step == 0:
         pred = lstm_net(batch_x, is_training=True)
         loss = cross_entropy_loss(pred, batch_y)
-        final_loss = loss
+        loss_accum += loss
+        loss_count += 1
         acc = accuracy(pred, batch_y)
-        final_accuracy = acc
+        accuracy_accum += acc
+        accuracy_count += 1
         print_time = timeit.default_timer()
         print("step: %i, loss: %f, accuracy: %f" % (step, loss, acc))
         skipped_time += timeit.default_timer() - print_time
 
 time = timeit.default_timer() - start_time - skipped_time
 
-write_csv(__file__, training_steps, float(final_accuracy), float(final_loss), time)
+write_csv(__file__, training_steps, float(accuracy_accum)/float(accuracy_count), float(loss_accum)/float(loss_count), time)
