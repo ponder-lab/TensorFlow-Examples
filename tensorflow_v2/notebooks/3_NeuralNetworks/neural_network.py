@@ -189,5 +189,5 @@ write_csv(__file__, epochs=1, loss=float(avg_loss), accuracy=float(avg_acc), tim
 # Display image and model prediction.
 for i in range(n_images):
     plt.imshow(np.reshape(test_images[i], [28, 28]), cmap='gray')
-    plt.show()
+    # plt.show()
     print("Model prediction: %i" % np.argmax(predictions.numpy()[i]))
