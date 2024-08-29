@@ -189,7 +189,7 @@ for i, (batch_x, _) in enumerate(test_data.take(n)):
 time = timeit.default_timer() - start_time - skipped_time
 avg_loss = float(total_loss) / float(loss_count)
 
-write_csv(__file__, epochs=1, loss=float(avg_loss), time=time)
+write_csv(__file__, epochs=training_steps, loss=float(avg_loss), time=time)
 
 print("Original Images")
 plt.figure(figsize=(n, n))
