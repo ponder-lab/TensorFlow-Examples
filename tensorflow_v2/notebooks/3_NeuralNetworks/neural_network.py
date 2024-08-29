@@ -35,10 +35,9 @@ print("TensorFlow version:", tf.__version__)
 assert(tf.__version__ == "2.9.3")
 from tensorflow.keras import Model, layers
 import numpy as np
-import timeit
 
-start_time = timeit.default_timer()
-skipped_time = 0
+from scripts.utils import write_csv
+import timeit
 
 # %%
 # MNIST dataset parameters.
@@ -70,6 +69,9 @@ x_train, x_test = x_train / 255., x_test / 255.
 # Use tf.data API to shuffle and batch data.
 train_data = tf.data.Dataset.from_tensor_slices((x_train, y_train))
 train_data = train_data.repeat().shuffle(5000).batch(batch_size).prefetch(1)
+
+start_time = timeit.default_timer()
+skipped_time = 0
 
 # %%
 # Create TF Model.
@@ -141,6 +143,12 @@ def run_optimization(x, y):
     # Update W and b following gradients.
     optimizer.apply_gradients(zip(gradients, trainable_variables))
 
+loss_accum = 0
+loss_count = 0
+
+acc_accum = 0
+acc_count = 0
+
 # %%
 # Run training for the given number of steps.
 for step, (batch_x, batch_y) in enumerate(train_data.take(training_steps), 1):
@@ -153,6 +161,10 @@ for step, (batch_x, batch_y) in enumerate(train_data.take(training_steps), 1):
         acc = accuracy(pred, batch_y)
         print_time = timeit.default_timer()
         print("step: %i, loss: %f, accuracy: %f" % (step, loss, acc))
+        loss_accum += loss
+        loss_count += 1
+        acc_accum += acc
+        acc_count += 1
         skipped_time += timeit.default_timer() - print_time
 
 # %%
@@ -172,10 +184,14 @@ n_images = 5
 test_images = x_test[:n_images]
 predictions = neural_net(test_images)
 
-print("Elapsed time: ", timeit.default_timer() - start_time - skipped_time)
+time = timeit.default_timer() - start_time - skipped_time
+avg_loss = float(loss_accum) / float(loss_count)
+avg_acc = float(acc_accum) / float(acc_count)
+
+write_csv(__file__, epochs=1, loss=float(avg_loss), accuracy=float(avg_acc), time=time)
 
 # Display image and model prediction.
 for i in range(n_images):
     plt.imshow(np.reshape(test_images[i], [28, 28]), cmap='gray')
-    plt.show()
+    # plt.show()
     print("Model prediction: %i" % np.argmax(predictions.numpy()[i]))
