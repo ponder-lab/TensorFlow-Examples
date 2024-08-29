@@ -37,6 +37,9 @@ assert(tf.__version__ == "2.9.3")
 import numpy as np
 import timeit
 
+from scripts.utils import write_csv
+import timeit
+
 start_time = timeit.default_timer()
 skipped_time = 0
 
@@ -187,15 +190,17 @@ for i, (batch_x, _) in enumerate(test_data.take(n)):
         canvas_recon[i * 28:(i + 1) * 28, j * 28:(j + 1) * 28] = reconstr_img
     skipped_time += timeit.default_timer() - viz_time
 
-print("Elapsed time: ", timeit.default_timer() - start_time - skipped_time)
-print("Average loss: %f" % (total_loss / float(loss_count)))
+time = timeit.default_timer() - start_time - skipped_time
+avg_loss = float(total_loss) / float(loss_count)
+
+write_csv(__file__, epochs=1, loss=float(avg_loss), time=time)
 
 print("Original Images")
 plt.figure(figsize=(n, n))
 plt.imshow(canvas_orig, origin="upper", cmap="gray")
-plt.show()
+# plt.show()
 
 print("Reconstructed Images")
 plt.figure(figsize=(n, n))
 plt.imshow(canvas_recon, origin="upper", cmap="gray")
-plt.show()
+# plt.show()
