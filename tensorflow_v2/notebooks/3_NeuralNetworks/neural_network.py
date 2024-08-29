@@ -184,7 +184,7 @@ time = timeit.default_timer() - start_time - skipped_time
 avg_loss = float(loss_accum) / float(loss_count)
 avg_acc = float(acc_accum) / float(acc_count)
 
-write_csv(__file__, epochs=1, loss=float(avg_loss), accuracy=float(avg_acc), time=time)
+write_csv(__file__, epochs=training_steps, loss=float(avg_loss), accuracy=float(avg_acc), time=time)
 
 # Display image and model prediction.
 for i in range(n_images):
