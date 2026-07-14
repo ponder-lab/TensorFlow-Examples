@@ -140,11 +140,13 @@ discriminator = Discriminator()
 
 # %%
 # Losses.
+@tf.function
 def generator_loss(reconstructed_image):
     gen_loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(
         logits=reconstructed_image, labels=tf.ones([batch_size], dtype=tf.int32)))
     return gen_loss
 
+@tf.function
 def discriminator_loss(disc_fake, disc_real):
     disc_loss_real = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(
         logits=disc_real, labels=tf.ones([batch_size], dtype=tf.int32)))
@@ -158,6 +160,7 @@ optimizer_disc = tf.optimizers.Adam(learning_rate=lr_discriminator)#, beta_1=0.5
 
 # %%
 # Optimization process. Inputs: real image and noise.
+@tf.function
 def run_optimization(real_images):
 
     # Rescale to [-1, 1], the input range of the discriminator

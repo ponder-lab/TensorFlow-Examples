@@ -130,6 +130,7 @@ with tf.device('/cpu:0'):
     nce_weights = tf.Variable(tf.random.normal([vocabulary_size, embedding_size]))
     nce_biases = tf.Variable(tf.zeros([vocabulary_size]))
 
+@tf.function
 def get_embedding(x):
     with tf.device('/cpu:0'):
         # Lookup the corresponding embedding vectors for each sample in X.
@@ -166,6 +167,7 @@ optimizer = tf.optimizers.SGD(learning_rate)
 
 # %%
 # Optimization process.
+@tf.function
 def run_optimization(x, y):
     with tf.device('/cpu:0'):
         # Wrap computation inside a GradientTape for automatic differentiation.

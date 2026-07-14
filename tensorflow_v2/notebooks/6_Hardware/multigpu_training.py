@@ -166,6 +166,7 @@ def backprop(batch_x, batch_y, trainable_variables):
     return gradients
 
 # Build the function to average the gradients.
+@tf.function
 def average_gradients(tower_grads):
     avg_grads = []
     for tgrads in zip(*tower_grads):

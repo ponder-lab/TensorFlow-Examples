@@ -44,6 +44,7 @@ PIL.Image.fromarray(img_array)
 
 # %%
 # Randomly flip an image.
+@tf.function
 def random_flip_left_right(image):
     return tf.image.random_flip_left_right(image)
 
@@ -126,6 +127,7 @@ PIL.Image.fromarray(distorted_random_crop(img_array).numpy())
 # %%
 # Apply all transformations to an image.
 # That is a common image augmentation technique for image datasets, such as ImageNet.
+@tf.function
 def transform_image(image):
     image = distorted_random_crop(image)
     image = random_flip_left_right(image)

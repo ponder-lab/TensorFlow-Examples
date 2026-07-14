@@ -113,6 +113,7 @@ class CustomLayer2(layers.Layer):
         # Make sure to call the `build` method at the end
         super(CustomLayer2, self).build(input_shape)
 
+    @tf.function
     def call(self, inputs):
         x = self.inner_layer1(inputs)
         x = tf.nn.relu(x)
