@@ -1,0 +1,12 @@
+{
+  "types": [
+    {
+      "module": "tensorflow_v2/notebooks/5_DataManagement/image_transformation.py",
+      "function": "",
+      "variable": "img_array",
+      "dtype": "uint8",
+      "shape": "1332 800 3",
+      "attribution": "Decoded JPEG pixel data (image.jpeg, RGB 800x1332), verified against the file on disk; no dtype= appears in the code, and a 16-bit source would change the dtype with the same code."
+    }
+  ]
+}
