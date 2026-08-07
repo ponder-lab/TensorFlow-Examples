@@ -190,7 +190,6 @@ with tf.device('/cpu:0'):
 
 # %%
 # Optimization process.
-@tf.function
 def run_optimization(x, y):
     # Save gradients for all GPUs.
     tower_grads = []
