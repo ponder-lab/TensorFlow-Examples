@@ -68,11 +68,13 @@ W = tf.Variable(tf.ones([num_features, num_classes]), name="weight")
 b = tf.Variable(tf.zeros([num_classes]), name="bias")
 
 # Logistic regression (Wx + b).
+@tf.function(input_signature=[tf.TensorSpec(shape=(None, 784), dtype=tf.float32)])
 def logistic_regression(x):
     # Apply softmax to normalize the logits to a probability distribution.
     return tf.nn.softmax(tf.matmul(x, W) + b)
 
 # Cross-Entropy loss function.
+@tf.function(input_signature=[tf.TensorSpec(shape=(256, 10), dtype=tf.float32), tf.TensorSpec(shape=(256,), dtype=tf.uint8)])
 def cross_entropy(y_pred, y_true):
     # Encode label to a one hot vector.
     y_true = tf.one_hot(y_true, depth=num_classes)
@@ -82,6 +84,7 @@ def cross_entropy(y_pred, y_true):
     return tf.reduce_mean(-tf.reduce_sum(y_true * tf.math.log(y_pred),1))
 
 # Accuracy metric.
+@tf.function(input_signature=[tf.TensorSpec(shape=None, dtype=tf.float32), tf.TensorSpec(shape=(None,), dtype=tf.uint8)])
 def accuracy(y_pred, y_true):
     # Predicted class is the index of highest score in prediction vector (i.e. argmax).
     correct_prediction = tf.equal(tf.argmax(y_pred, 1), tf.cast(y_true, tf.int64))
@@ -92,6 +95,7 @@ optimizer = tf.optimizers.SGD(learning_rate)
 
 # %%
 # Optimization process.
+@tf.function(input_signature=[tf.TensorSpec(shape=(256, 784), dtype=tf.float32), tf.TensorSpec(shape=(256,), dtype=tf.uint8)])
 def run_optimization(x, y):
     # Wrap computation inside a GradientTape for automatic differentiation.
     with tf.GradientTape() as g:
