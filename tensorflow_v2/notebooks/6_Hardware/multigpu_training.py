@@ -136,7 +136,7 @@ class ConvNet(Model):
 # %%
 # Cross-Entropy Loss.
 # Note that this will apply 'softmax' to the logits.
-@tf.function
+@tf.function(input_signature=[tf.TensorSpec(shape=None, dtype=tf.float32), tf.TensorSpec(shape=(4096,), dtype=tf.uint8)])
 def cross_entropy_loss(x, y):
     # Convert labels to int 64 for tf cross-entropy function.
     y = tf.cast(y, tf.int64)
@@ -146,7 +146,7 @@ def cross_entropy_loss(x, y):
     return tf.reduce_mean(loss)
 
 # Accuracy metric.
-@tf.function
+@tf.function(input_signature=[tf.TensorSpec(shape=None, dtype=tf.float32), tf.TensorSpec(shape=(4096,), dtype=tf.uint8)])
 def accuracy(y_pred, y_true):
     # Predicted class is the index of highest score in prediction vector (i.e. argmax).
     correct_prediction = tf.equal(tf.argmax(y_pred, 1), tf.cast(y_true, tf.int64))
