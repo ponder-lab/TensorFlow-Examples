@@ -38,12 +38,10 @@ W = tf.Variable(rng.randn(), name="weight")
 b = tf.Variable(rng.randn(), name="bias")
 
 # Linear regression (Wx + b).
-@tf.function
 def linear_regression(x):
     return W * x + b
 
 # Mean square error.
-@tf.function
 def mean_square(y_pred, y_true):
     return tf.reduce_mean(tf.square(y_pred - y_true))
 
