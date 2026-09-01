@@ -28,7 +28,11 @@ import tensorflow as tf
 
 # %%
 # Download an image.
-d = requests.get("https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Tour_Eiffel_Wikimedia_Commons_%28cropped%29.jpg/800px-Tour_Eiffel_Wikimedia_Commons_%28cropped%29.jpg")
+# Wikimedia requires a descriptive User-Agent and no longer serves this file's
+# thumbnail path, so fetch the full-size original and scale it down below.
+headers = {"User-Agent": "TensorFlow-Examples (https://github.com/aymericdamien/TensorFlow-Examples)"}
+d = requests.get("https://upload.wikimedia.org/wikipedia/commons/8/85/Tour_Eiffel_Wikimedia_Commons_%28cropped%29.jpg", headers=headers)
+d.raise_for_status()
 with open("image.jpeg", "wb") as f:
     f.write(d.content)
 
@@ -36,6 +40,8 @@ with open("image.jpeg", "wb") as f:
 # Load image to numpy array.
 img = PIL.Image.open('image.jpeg')
 img.load()
+# Scale to 800px wide, the size this notebook used to request from Wikimedia.
+img = img.resize((800, round(800 * img.height / img.width)))
 img_array = np.array(img)
 
 # %%
