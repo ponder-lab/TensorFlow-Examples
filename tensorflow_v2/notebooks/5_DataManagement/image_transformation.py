@@ -31,7 +31,7 @@ import tensorflow as tf
 # Wikimedia requires a descriptive User-Agent and no longer serves this file's
 # thumbnail path, so ask for the full-size original instead.
 headers = {"User-Agent": "TensorFlow-Examples (https://github.com/aymericdamien/TensorFlow-Examples)"}
-d = requests.get("https://upload.wikimedia.org/wikipedia/commons/8/85/Tour_Eiffel_Wikimedia_Commons_%28cropped%29.jpg", headers=headers)
+d = requests.get("https://upload.wikimedia.org/wikipedia/commons/8/85/Tour_Eiffel_Wikimedia_Commons_%28cropped%29.jpg", headers=headers, timeout=30)
 d.raise_for_status()
 with open("image.jpeg", "wb") as f:
     f.write(d.content)
