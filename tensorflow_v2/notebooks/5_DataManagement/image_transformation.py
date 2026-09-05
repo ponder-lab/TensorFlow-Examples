@@ -106,7 +106,7 @@ PIL.Image.fromarray(random_hue(img_array).numpy())
 
 # %%
 # Distort an image by cropping it with a different aspect ratio.
-@tf.function(input_signature=[tf.TensorSpec(shape=(1332, 800, 3), dtype=tf.uint8)])
+@tf.function(input_signature=[tf.TensorSpec(shape=(4830, 2900, 3), dtype=tf.uint8)])
 def distorted_random_crop(image,
                 min_object_covered=0.1,
                 aspect_ratio_range=(3./4., 4./3.),
@@ -136,7 +136,7 @@ PIL.Image.fromarray(distorted_random_crop(img_array).numpy())
 # %%
 # Apply all transformations to an image.
 # That is a common image augmentation technique for image datasets, such as ImageNet.
-@tf.function(input_signature=[tf.TensorSpec(shape=(1332, 800, 3), dtype=tf.uint8)])
+@tf.function(input_signature=[tf.TensorSpec(shape=(4830, 2900, 3), dtype=tf.uint8)])
 def transform_image(image):
     image = distorted_random_crop(image)
     image = random_flip_left_right(image)

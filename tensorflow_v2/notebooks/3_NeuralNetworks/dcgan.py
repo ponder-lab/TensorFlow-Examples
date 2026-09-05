@@ -140,13 +140,13 @@ discriminator = Discriminator()
 
 # %%
 # Losses.
-@tf.function(input_signature=[tf.TensorSpec(shape=(None, 2), dtype=tf.float32)])
+@tf.function(input_signature=[tf.TensorSpec(shape=(128, 2), dtype=tf.float32)])
 def generator_loss(reconstructed_image):
     gen_loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(
         logits=reconstructed_image, labels=tf.ones([batch_size], dtype=tf.int32)))
     return gen_loss
 
-@tf.function(input_signature=[tf.TensorSpec(shape=(None, 2), dtype=tf.float32), tf.TensorSpec(shape=(None, 2), dtype=tf.float32)])
+@tf.function(input_signature=[tf.TensorSpec(shape=(128, 2), dtype=tf.float32), tf.TensorSpec(shape=(128, 2), dtype=tf.float32)])
 def discriminator_loss(disc_fake, disc_real):
     disc_loss_real = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(
         logits=disc_real, labels=tf.ones([batch_size], dtype=tf.int32)))
