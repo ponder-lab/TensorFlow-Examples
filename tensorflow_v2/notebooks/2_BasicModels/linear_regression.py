@@ -38,6 +38,7 @@ W = tf.Variable(rng.randn(), name="weight")
 b = tf.Variable(rng.randn(), name="bias")
 
 # Linear regression (Wx + b).
+@tf.function(input_signature=[tf.TensorSpec(shape=(17,), dtype=tf.float32)])
 def linear_regression(x):
     return W * x + b
 
