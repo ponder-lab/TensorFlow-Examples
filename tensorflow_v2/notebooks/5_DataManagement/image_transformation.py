@@ -48,7 +48,7 @@ PIL.Image.fromarray(img_array)
 
 # %%
 # Randomly flip an image.
-@tf.function(input_signature=[tf.TensorSpec(shape=None, dtype=tf.uint8)])
+@tf.function(input_signature=[tf.TensorSpec(shape=(None, None, None), dtype=tf.uint8)])
 def random_flip_left_right(image):
     return tf.image.random_flip_left_right(image)
 
@@ -58,7 +58,7 @@ PIL.Image.fromarray(random_flip_left_right(img_array).numpy())
 
 # %%
 # Randomly change an image contrast.
-@tf.function(input_signature=[tf.TensorSpec(shape=None, dtype=tf.uint8)])
+@tf.function(input_signature=[tf.TensorSpec(shape=(None, None, None), dtype=tf.uint8)])
 def random_contrast(image, minval=0.6, maxval=1.4):
     r = tf.random.uniform([], minval=minval, maxval=maxval)
     image = tf.image.adjust_contrast(image, contrast_factor=r)
@@ -70,7 +70,7 @@ PIL.Image.fromarray(random_contrast(img_array).numpy())
 
 # %%
 # Randomly change an image brightness
-@tf.function(input_signature=[tf.TensorSpec(shape=None, dtype=tf.uint8)])
+@tf.function(input_signature=[tf.TensorSpec(shape=(None, None, None), dtype=tf.uint8)])
 def random_brightness(image, minval=0., maxval=.2):
     r = tf.random.uniform([], minval=minval, maxval=maxval)
     image = tf.image.adjust_brightness(image, delta=r)
@@ -82,7 +82,7 @@ PIL.Image.fromarray(random_brightness(img_array).numpy())
 
 # %%
 # Randomly change an image saturation
-@tf.function(input_signature=[tf.TensorSpec(shape=None, dtype=tf.uint8)])
+@tf.function(input_signature=[tf.TensorSpec(shape=(None, None, None), dtype=tf.uint8)])
 def random_saturation(image, minval=0.4, maxval=2.):
     r = tf.random.uniform((), minval=minval, maxval=maxval)
     image = tf.image.adjust_saturation(image, saturation_factor=r)
@@ -94,7 +94,7 @@ PIL.Image.fromarray(random_saturation(img_array).numpy())
 
 # %%
 # Randomly change an image hue.
-@tf.function(input_signature=[tf.TensorSpec(shape=None, dtype=tf.uint8)])
+@tf.function(input_signature=[tf.TensorSpec(shape=(None, None, None), dtype=tf.uint8)])
 def random_hue(image, minval=-0.04, maxval=0.08):
     r = tf.random.uniform((), minval=minval, maxval=maxval)
     image = tf.image.adjust_hue(image, delta=r)

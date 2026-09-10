@@ -84,7 +84,7 @@ def cross_entropy(y_pred, y_true):
     return tf.reduce_mean(-tf.reduce_sum(y_true * tf.math.log(y_pred),1))
 
 # Accuracy metric.
-@tf.function(input_signature=[tf.TensorSpec(shape=None, dtype=tf.float32), tf.TensorSpec(shape=(None,), dtype=tf.uint8)])
+@tf.function(input_signature=[tf.TensorSpec(shape=(None, 10), dtype=tf.float32), tf.TensorSpec(shape=(None,), dtype=tf.uint8)])
 def accuracy(y_pred, y_true):
     # Predicted class is the index of highest score in prediction vector (i.e. argmax).
     correct_prediction = tf.equal(tf.argmax(y_pred, 1), tf.cast(y_true, tf.int64))
