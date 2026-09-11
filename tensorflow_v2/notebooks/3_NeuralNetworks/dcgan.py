@@ -84,6 +84,7 @@ class Generator(Model):
         self.conv2tr2 = layers.Conv2DTranspose(1, 5, strides=2, padding='SAME')
 
     # Set forward pass.
+    @tf.function
     def call(self, x, is_training=False):
         x = self.fc1(x)
         x = self.bn1(x, training=is_training)
@@ -118,6 +119,7 @@ class Discriminator(Model):
         self.fc2 = layers.Dense(2)
 
     # Set forward pass.
+    @tf.function
     def call(self, x, is_training=False):
         x = tf.reshape(x, [-1, 28, 28, 1])
         x = self.conv1(x)
@@ -138,11 +140,13 @@ discriminator = Discriminator()
 
 # %%
 # Losses.
+@tf.function(input_signature=[tf.TensorSpec(shape=(128, 2), dtype=tf.float32)])
 def generator_loss(reconstructed_image):
     gen_loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(
         logits=reconstructed_image, labels=tf.ones([batch_size], dtype=tf.int32)))
     return gen_loss
 
+@tf.function(input_signature=[tf.TensorSpec(shape=(128, 2), dtype=tf.float32), tf.TensorSpec(shape=(128, 2), dtype=tf.float32)])
 def discriminator_loss(disc_fake, disc_real):
     disc_loss_real = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(
         logits=disc_real, labels=tf.ones([batch_size], dtype=tf.int32)))
@@ -156,6 +160,7 @@ optimizer_disc = tf.optimizers.Adam(learning_rate=lr_discriminator)#, beta_1=0.5
 
 # %%
 # Optimization process. Inputs: real image and noise.
+@tf.function(input_signature=[tf.TensorSpec(shape=(128, 28, 28), dtype=tf.float32)])
 def run_optimization(real_images):
 
     # Rescale to [-1, 1], the input range of the discriminator

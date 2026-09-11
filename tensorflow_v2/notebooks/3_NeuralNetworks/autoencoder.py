@@ -97,6 +97,7 @@ biases = {
 
 # %%
 # Building the encoder.
+@tf.function(input_signature=[tf.TensorSpec(shape=(256, 784), dtype=tf.float32)])
 def encoder(x):
     # Encoder Hidden layer with sigmoid activation.
     layer_1 = tf.nn.sigmoid(tf.add(tf.matmul(x, weights['encoder_h1']),
@@ -108,6 +109,7 @@ def encoder(x):
 
 
 # Building the decoder.
+@tf.function(input_signature=[tf.TensorSpec(shape=(256, 64), dtype=tf.float32)])
 def decoder(x):
     # Decoder Hidden layer with sigmoid activation.
     layer_1 = tf.nn.sigmoid(tf.add(tf.matmul(x, weights['decoder_h1']),
@@ -119,6 +121,7 @@ def decoder(x):
 
 # %%
 # Mean square loss between original images and reconstructed ones.
+@tf.function(input_signature=[tf.TensorSpec(shape=(256, 784), dtype=tf.float32), tf.TensorSpec(shape=(256, 784), dtype=tf.float32)])
 def mean_square(reconstructed, original):
     return tf.reduce_mean(tf.pow(original - reconstructed, 2))
 
@@ -127,6 +130,7 @@ optimizer = tf.optimizers.Adam(learning_rate=learning_rate)
 
 # %%
 # Optimization process.
+@tf.function(input_signature=[tf.TensorSpec(shape=(256, 784), dtype=tf.float32)])
 def run_optimization(x):
     # Wrap computation inside a GradientTape for automatic differentiation.
     with tf.GradientTape() as g:
