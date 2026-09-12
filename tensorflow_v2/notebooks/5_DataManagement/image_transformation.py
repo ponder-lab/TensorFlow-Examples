@@ -48,6 +48,7 @@ PIL.Image.fromarray(img_array)
 
 # %%
 # Randomly flip an image.
+@tf.function
 def random_flip_left_right(image):
     return tf.image.random_flip_left_right(image)
 
@@ -57,6 +58,7 @@ PIL.Image.fromarray(random_flip_left_right(img_array).numpy())
 
 # %%
 # Randomly change an image contrast.
+@tf.function
 def random_contrast(image, minval=0.6, maxval=1.4):
     r = tf.random.uniform([], minval=minval, maxval=maxval)
     image = tf.image.adjust_contrast(image, contrast_factor=r)
@@ -68,6 +70,7 @@ PIL.Image.fromarray(random_contrast(img_array).numpy())
 
 # %%
 # Randomly change an image brightness
+@tf.function
 def random_brightness(image, minval=0., maxval=.2):
     r = tf.random.uniform([], minval=minval, maxval=maxval)
     image = tf.image.adjust_brightness(image, delta=r)
@@ -79,6 +82,7 @@ PIL.Image.fromarray(random_brightness(img_array).numpy())
 
 # %%
 # Randomly change an image saturation
+@tf.function
 def random_saturation(image, minval=0.4, maxval=2.):
     r = tf.random.uniform((), minval=minval, maxval=maxval)
     image = tf.image.adjust_saturation(image, saturation_factor=r)
@@ -90,6 +94,7 @@ PIL.Image.fromarray(random_saturation(img_array).numpy())
 
 # %%
 # Randomly change an image hue.
+@tf.function
 def random_hue(image, minval=-0.04, maxval=0.08):
     r = tf.random.uniform((), minval=minval, maxval=maxval)
     image = tf.image.adjust_hue(image, delta=r)
@@ -101,6 +106,7 @@ PIL.Image.fromarray(random_hue(img_array).numpy())
 
 # %%
 # Distort an image by cropping it with a different aspect ratio.
+@tf.function
 def distorted_random_crop(image,
                 min_object_covered=0.1,
                 aspect_ratio_range=(3./4., 4./3.),
@@ -130,6 +136,7 @@ PIL.Image.fromarray(distorted_random_crop(img_array).numpy())
 # %%
 # Apply all transformations to an image.
 # That is a common image augmentation technique for image datasets, such as ImageNet.
+@tf.function
 def transform_image(image):
     image = distorted_random_crop(image)
     image = random_flip_left_right(image)
