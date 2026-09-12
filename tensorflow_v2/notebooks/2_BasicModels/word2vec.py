@@ -130,12 +130,14 @@ with tf.device('/cpu:0'):
     nce_weights = tf.Variable(tf.random.normal([vocabulary_size, embedding_size]))
     nce_biases = tf.Variable(tf.zeros([vocabulary_size]))
 
+@tf.function
 def get_embedding(x):
     with tf.device('/cpu:0'):
         # Lookup the corresponding embedding vectors for each sample in X.
         x_embed = tf.nn.embedding_lookup(embedding, x)
         return x_embed
 
+@tf.function(input_signature=[tf.TensorSpec(shape=(128, 200), dtype=tf.float32), tf.TensorSpec(shape=(128, 1), dtype=tf.int32)])
 def nce_loss(x_embed, y):
     with tf.device('/cpu:0'):
         # Compute the average NCE loss for the batch.
@@ -164,6 +166,7 @@ optimizer = tf.optimizers.SGD(learning_rate)
 
 # %%
 # Optimization process.
+@tf.function(input_signature=[tf.TensorSpec(shape=(128,), dtype=tf.int32), tf.TensorSpec(shape=(128, 1), dtype=tf.int32)])
 def run_optimization(x, y):
     with tf.device('/cpu:0'):
         # Wrap computation inside a GradientTape for automatic differentiation.
