@@ -173,7 +173,7 @@ def load_image(path):
     image = 1. - image / 127.5
     return image
 # Decode each line from the dataset file.
-@tf.function
+@tf.function(input_signature=[tf.TensorSpec(shape=(), dtype=tf.string)])
 def parse_records(line):
     # File is in csv format: "image_path,label_id".
     # TensorFlow requires a default value, but it will never be used.
