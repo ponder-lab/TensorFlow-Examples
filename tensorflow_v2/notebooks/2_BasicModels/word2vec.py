@@ -28,7 +28,7 @@ import tensorflow as tf
 # Training Parameters.
 learning_rate = 0.1
 batch_size = 128
-num_steps = 3000000
+num_steps = 200000
 display_step = 10000
 eval_step = 200000
 
