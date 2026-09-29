@@ -135,6 +135,7 @@ filenames = ["titanic_dataset.tfrecord"]
 data = tf.data.TFRecordDataset(filenames)
 
 # Parse features, using the above template.
+@tf.function
 def parse_record(record):
     return tf.io.parse_single_example(record, features=features)
 # Apply the parsing to each record from the dataset.
