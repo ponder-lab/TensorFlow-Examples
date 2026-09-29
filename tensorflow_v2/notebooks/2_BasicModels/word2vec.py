@@ -1,3 +1,5 @@
+from scripts.utils import write_csv
+import timeit
 # %%
 """
 # Word2Vec (Word Embedding)
@@ -87,6 +89,9 @@ print("Words count:", len(text_words))
 print("Unique words:", len(set(text_words)))
 print("Vocabulary size:", vocabulary_size)
 print("Most common words:", count[:10])
+
+start_time = timeit.default_timer()
+skipped_time = 0
 
 # %%
 data_index = 0
@@ -180,6 +185,9 @@ def run_optimization(x, y):
         # Update W and b following gradients.
         optimizer.apply_gradients(zip(gradients, [embedding, nce_weights, nce_biases]))
 
+total_loss = 0
+loss_count = 0
+
 # %%
 # Words for testing.
 x_test = np.array([word2id[w.encode()] for w in eval_words])
@@ -191,11 +199,17 @@ for step in range(1, num_steps + 1):
 
     if step % display_step == 0 or step == 1:
         loss = nce_loss(get_embedding(batch_x), batch_y)
+        total_loss += loss
+        loss_count += 1
+        print_time = timeit.default_timer()
         print("step: %i, loss: %f" % (step, loss))
+        skipped_time += timeit.default_timer() - print_time
 
     # Evaluation.
     if step % eval_step == 0 or step == 1:
+        print_time = timeit.default_timer()
         print("Evaluation...")
+        skipped_time += timeit.default_timer() - print_time
         sim = evaluate(get_embedding(x_test)).numpy()
         for i in range(len(eval_words)):
             top_k = 8  # number of nearest neighbors.
@@ -203,4 +217,11 @@ for step in range(1, num_steps + 1):
             log_str = '"%s" nearest neighbors:' % eval_words[i]
             for k in range(top_k):
                 log_str = '%s %s,' % (log_str, id2word[nearest[k]])
+            print_time = timeit.default_timer()
             print(log_str)
+            skipped_time += timeit.default_timer() - print_time
+
+time = timeit.default_timer() - start_time - skipped_time
+avg_loss = float(total_loss) / float(loss_count)
+
+write_csv(__file__, epochs=num_steps, loss=float(avg_loss), time=time)
