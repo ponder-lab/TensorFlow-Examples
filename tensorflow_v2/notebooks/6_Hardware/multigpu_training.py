@@ -45,7 +45,7 @@ num_gpus = 4
 
 # Training parameters.
 learning_rate = 0.001
-training_steps = 1000
+training_steps = 340
 # Split batch size equally between GPUs.
 # Note: Reduce batch size if you encounter OOM Errors.
 batch_size = 1024 * num_gpus
