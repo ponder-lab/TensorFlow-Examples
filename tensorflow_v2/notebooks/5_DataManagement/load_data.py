@@ -19,6 +19,8 @@ For more information about creating and loading TensorFlow's `TFRecords` data fo
 # %%
 
 
+from scripts.utils import write_csv
+import timeit
 import numpy as np
 import random
 import requests
@@ -34,6 +36,9 @@ Build a data pipeline over numpy arrays.
 """
 
 # %%
+start_time = timeit.default_timer()
+skipped_time = 0
+
 # Create a toy dataset (even and odd numbers, with respective labels of 0 and 1).
 evens = np.arange(0, 100, step=2, dtype=np.int32)
 evens_label = np.zeros(50, dtype=np.int32)
@@ -56,7 +61,9 @@ data = data.prefetch(buffer_size=1)
 
 # %%
 for batch_x, batch_y in data.take(5):
+    print_time = timeit.default_timer()
     print(batch_x, batch_y)
+    skipped_time += timeit.default_timer() - print_time
 
 # %%
 # Note: If you are planning on calling multiple time,
@@ -64,11 +71,15 @@ for batch_x, batch_y in data.take(5):
 ite_data = iter(data)
 for i in range(5):
     batch_x, batch_y = next(ite_data)
+    print_time = timeit.default_timer()
     print(batch_x, batch_y)
+    skipped_time += timeit.default_timer() - print_time
 
 for i in range(5):
     batch_x, batch_y = next(ite_data)
+    print_time = timeit.default_timer()
     print(batch_x, batch_y)
+    skipped_time += timeit.default_timer() - print_time
 
 # %%
 """
@@ -94,9 +105,11 @@ survived|pclass|name|sex|age|sibsp|parch|ticket|fare
 
 # %%
 # Download Titanic dataset (in csv format).
+download_time = timeit.default_timer()
 d = requests.get("https://raw.githubusercontent.com/tflearn/tflearn.github.io/master/resources/titanic_dataset.csv")
 with open("titanic_dataset.csv", "wb") as f:
     f.write(d.content)
+skipped_time += timeit.default_timer() - download_time
 
 # %%
 # Load Titanic dataset.
@@ -118,12 +131,24 @@ data = data.prefetch(buffer_size=1)
 
 # %%
 for survived, pclass, name, sex, age, fare in data.take(1):
+    print_time = timeit.default_timer()
     print(survived.numpy())
+    skipped_time += timeit.default_timer() - print_time
+    print_time = timeit.default_timer()
     print(pclass.numpy())
+    skipped_time += timeit.default_timer() - print_time
+    print_time = timeit.default_timer()
     print(name.numpy())
+    skipped_time += timeit.default_timer() - print_time
+    print_time = timeit.default_timer()
     print(sex.numpy())
+    skipped_time += timeit.default_timer() - print_time
+    print_time = timeit.default_timer()
     print(age.numpy())
+    skipped_time += timeit.default_timer() - print_time
+    print_time = timeit.default_timer()
     print(fare.numpy())
+    skipped_time += timeit.default_timer() - print_time
 
 # %%
 """
@@ -134,12 +159,16 @@ Build a data pipeline by loading images from disk. For this example, Oxford Flow
 
 # %%
 # Download Oxford 17 flowers dataset
+download_time = timeit.default_timer()
 d = requests.get("http://www.robots.ox.ac.uk/~vgg/data/flowers/17/17flowers.tgz")
 with open("17flowers.tgz", "wb") as f:
     f.write(d.content)
+skipped_time += timeit.default_timer() - download_time
 # Extract archive.
+extract_time = timeit.default_timer()
 with tarfile.open("17flowers.tgz") as t:
     t.extractall()
+skipped_time += timeit.default_timer() - extract_time
 
 # %%
 with open('jpg/dataset.csv', 'w') as f:
@@ -191,7 +220,9 @@ data = data.prefetch(buffer_size=1)
 
 # %%
 for batch_x, batch_y in data.take(1):
+    print_time = timeit.default_timer()
     print(batch_x, batch_y)
+    skipped_time += timeit.default_timer() - print_time
 
 # %%
 """
@@ -222,4 +253,10 @@ data = data.prefetch(buffer_size=1)
 # %%
 # Display data.
 for batch_str, batch_vector, batch_int in data.take(5):
+    print_time = timeit.default_timer()
     print(batch_str, batch_vector, batch_int)
+    skipped_time += timeit.default_timer() - print_time
+
+time = timeit.default_timer() - start_time - skipped_time
+
+write_csv(__file__, time=time)
