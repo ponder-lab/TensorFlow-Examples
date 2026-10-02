@@ -12,6 +12,8 @@ This example is using a low-level approach to better understand all mechanics be
 
 # %%
 from __future__ import absolute_import, division, print_function
+from scripts.utils import write_csv
+import timeit
 
 # %%
 import tensorflow as tf
@@ -65,6 +67,12 @@ def run_optimization():
 
 # %%
 # Run training for the given number of steps.
+start_time = timeit.default_timer()
+skipped_time = 0
+
+total_loss = 0
+loss_count = 0
+
 for step in range(1, training_steps + 1):
     # Run the optimization to update W and b values.
     run_optimization()
@@ -72,7 +80,16 @@ for step in range(1, training_steps + 1):
     if step % display_step == 0:
         pred = linear_regression(X)
         loss = mean_square(pred, Y)
+        total_loss += loss
+        loss_count += 1
+        print_time = timeit.default_timer()
         print("step: %i, loss: %f, W: %f, b: %f" % (step, loss, W.numpy(), b.numpy()))
+        skipped_time += timeit.default_timer() - print_time
+
+time = timeit.default_timer() - start_time - skipped_time
+avg_loss = float(total_loss) / float(loss_count)
+
+write_csv(__file__, epochs=training_steps, loss=float(avg_loss), time=time)
 
 # %%
 import matplotlib.pyplot as plt
