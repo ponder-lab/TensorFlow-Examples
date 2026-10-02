@@ -138,12 +138,14 @@ vars_to_save = {"W": W, "b": b, "optimizer": optimizer}
 # TF Checkpoint, pass the dict as **kwargs.
 checkpoint = tf.train.Checkpoint(**vars_to_save)
 # TF CheckpointManager to manage saving parameters.
+save_time = timeit.default_timer()
 saver = tf.train.CheckpointManager(
       checkpoint, directory="./tf-example", max_to_keep=5)
 
 # %%
 # Save variables.
 saver.save()
+skipped_time += timeit.default_timer() - save_time
 
 # %%
 # Check weight value.
@@ -163,8 +165,10 @@ np.mean(W.numpy())
 vars_to_load = {"W": W, "b": b, "optimizer": optimizer}
 checkpoint = tf.train.Checkpoint(**vars_to_load)
 # Restore variables from latest checkpoint.
+load_time = timeit.default_timer()
 latest_ckpt = tf.train.latest_checkpoint("./tf-example")
 checkpoint.restore(latest_ckpt)
+skipped_time += timeit.default_timer() - load_time
 
 # %%
 # Confirm that W has been correctly restored.
