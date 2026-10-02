@@ -18,6 +18,8 @@ For more information about loading data with TF2.0, see: [load_data.ipynb](load_
 # %%
 
 
+from scripts.utils import write_csv
+import timeit
 from IPython.display import Image as IImage, display
 import numpy as np
 import PIL
@@ -38,6 +40,8 @@ with open("image.jpeg", "wb") as f:
 
 # %%
 # Load image to numpy array.
+start_time = timeit.default_timer()
+
 img = PIL.Image.open('image.jpeg')
 img.load()
 img_array = np.array(img)
@@ -161,3 +165,7 @@ def resize_image(image):
 # %%
 # Display resized image.
 PIL.Image.fromarray(resize_image(transformed_img).numpy())
+
+time = timeit.default_timer() - start_time
+
+write_csv(__file__, time=time)
