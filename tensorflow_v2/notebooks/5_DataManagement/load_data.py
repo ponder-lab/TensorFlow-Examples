@@ -171,12 +171,14 @@ with tarfile.open("17flowers.tgz") as t:
 skipped_time += timeit.default_timer() - extract_time
 
 # %%
+write_time = timeit.default_timer()
 with open('jpg/dataset.csv', 'w') as f:
     c = 0
     for i in range(1360):
         f.write("jpg/image_%04i.jpg,%i\n" % (i+1, c))
         if (i+1) % 80 == 0:
             c += 1
+skipped_time += timeit.default_timer() - write_time
 
 # %%
 # Load Images
