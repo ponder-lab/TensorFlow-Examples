@@ -167,11 +167,13 @@ for step, (batch_x, batch_y) in enumerate(train_data.take(training_steps), 1):
     # Export the computation graph to tensorboard after the first
     # computation step was performed.
     if step == 1:
+        export_time = timeit.default_timer()
         with summary_writer.as_default():
             tf.summary.trace_export(
                   name="trace",
                   step=0,
                   profiler_outdir=logs_path)
+        skipped_time += timeit.default_timer() - export_time
 
     if step % display_step == 0:
         pred = neural_net(batch_x)
@@ -187,10 +189,12 @@ for step, (batch_x, batch_y) in enumerate(train_data.take(training_steps), 1):
 
         # Write loss/acc metrics & weights to Tensorboard every few steps,
         # to avoid storing too much data.
+        summary_time = timeit.default_timer()
         with summary_writer.as_default():
             tf.summary.scalar('loss', loss, step=step)
             tf.summary.scalar('accuracy', acc, step=step)
             summarize_weights(step)
+        skipped_time += timeit.default_timer() - summary_time
 
 time = timeit.default_timer() - start_time - skipped_time
 avg_loss = float(total_loss) / float(loss_count)
