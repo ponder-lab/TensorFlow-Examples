@@ -47,6 +47,8 @@ fare            Passenger Fare
 # %%
 
 
+from scripts.utils import write_csv
+import timeit
 import csv
 import requests
 import tensorflow as tf
@@ -63,6 +65,9 @@ with open("titanic_dataset.csv", "wb") as f:
 """
 
 # %%
+start_time = timeit.default_timer()
+skipped_time = 0
+
 # Generate Integer Features.
 def build_int64_feature(data):
     return tf.train.Feature(int64_list=tf.train.Int64List(value=[data]))
@@ -153,6 +158,12 @@ data = data.prefetch(buffer_size=1)
 # %%
 # Dequeue data and display.
 for record in data.take(1):
+    print_time = timeit.default_timer()
     print((record['survived'].numpy()))
     print((record['name'].numpy()))
     print((record['fare'].numpy()))
+    skipped_time += timeit.default_timer() - print_time
+
+time = timeit.default_timer() - start_time - skipped_time
+
+write_csv(__file__, time=time)
