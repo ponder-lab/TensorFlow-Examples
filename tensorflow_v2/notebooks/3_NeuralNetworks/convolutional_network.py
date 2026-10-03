@@ -179,16 +179,12 @@ for step, (batch_x, batch_y) in enumerate(train_data.take(training_steps), 1):
         acc = accuracy(pred, batch_y)
         total_accuracy += acc
         accuracy_count += 1
-        print_time = timeit.default_timer()
         print("step: %i, loss: %f, accuracy: %f" % (step, loss, acc))
-        skipped_time += timeit.default_timer() - print_time
 
 # %%
 # Test model on validation set.
 pred = conv_net(x_test)
-print_time = timeit.default_timer()
 print("Test Accuracy: %f" % accuracy(pred, y_test))
-skipped_time += timeit.default_timer() - print_time
 
 # %%
 # Visualize predictions.

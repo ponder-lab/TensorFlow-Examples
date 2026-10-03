@@ -214,9 +214,7 @@ for step, (batch_x, _) in enumerate(train_data.take(training_steps + 1)):
         disc_loss = discriminator_loss(discriminator(batch_x), discriminator(generator(noise)))
         total_disc_loss += disc_loss
         disc_loss_count += 1
-        print_time = timeit.default_timer()
         print("initial: gen_loss: %f, disc_loss: %f" % (gen_loss, disc_loss))
-        skipped_time += timeit.default_timer() - print_time
         continue
 
     # Run the optimization.
@@ -227,9 +225,7 @@ for step, (batch_x, _) in enumerate(train_data.take(training_steps + 1)):
     disc_loss_count += 1
 
     if step % display_step == 0:
-        print_time = timeit.default_timer()
         print("step: %i, gen_loss: %f, disc_loss: %f" % (step, gen_loss, disc_loss))
-        skipped_time += timeit.default_timer() - print_time
 
 time = timeit.default_timer() - start_time - skipped_time
 avg_gen_loss = float(total_gen_loss) / float(gen_loss_count)

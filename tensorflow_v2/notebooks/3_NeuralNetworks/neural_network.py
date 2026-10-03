@@ -159,20 +159,16 @@ for step, (batch_x, batch_y) in enumerate(train_data.take(training_steps), 1):
         pred = neural_net(batch_x, is_training=True)
         loss = cross_entropy_loss(pred, batch_y)
         acc = accuracy(pred, batch_y)
-        print_time = timeit.default_timer()
         print("step: %i, loss: %f, accuracy: %f" % (step, loss, acc))
         loss_accum += loss
         loss_count += 1
         acc_accum += acc
         acc_count += 1
-        skipped_time += timeit.default_timer() - print_time
 
 # %%
 # Test model on validation set.
 pred = neural_net(x_test, is_training=False)
-print_time = timeit.default_timer()
 print("Test Accuracy: %f" % accuracy(pred, y_test))
-skipped_time += timeit.default_timer() - print_time
 
 # %%
 # Visualize predictions.
