@@ -176,7 +176,6 @@ for i, (batch_x, _) in enumerate(test_data.take(n)):
     # Encode and decode the digit image.
     reconstructed_images = decoder(encoder(batch_x))
     # Display original images.
-    viz_time = timeit.default_timer()
     for j in range(n):
         # Draw the generated digits.
         img = batch_x[j].numpy().reshape([28, 28])
@@ -186,7 +185,6 @@ for i, (batch_x, _) in enumerate(test_data.take(n)):
         # Draw the generated digits.
         reconstr_img = reconstructed_images[j].numpy().reshape([28, 28])
         canvas_recon[i * 28:(i + 1) * 28, j * 28:(j + 1) * 28] = reconstr_img
-    skipped_time += timeit.default_timer() - viz_time
 
 time = timeit.default_timer() - start_time - skipped_time
 avg_loss = float(total_loss) / float(loss_count)
