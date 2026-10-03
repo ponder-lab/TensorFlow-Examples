@@ -155,8 +155,9 @@ for step, (batch_x, batch_y) in enumerate(train_data.take(training_steps), 1):
         pred = neural_net(batch_x, is_training=True)
         loss = cross_entropy_loss(pred, batch_y)
         acc = accuracy(pred, batch_y)
+        loss_v, acc_v = float(loss), float(acc)  # Read in the timed region, so waiting for queued GPU work is counted; only the print is skipped.
         print_time = timeit.default_timer()
-        print("step: %i, loss: %f, accuracy: %f" % (step, loss, acc))
+        print("step: %i, loss: %f, accuracy: %f" % (step, loss_v, acc_v))
         loss_accum += loss
         loss_count += 1
         acc_accum += acc
@@ -166,8 +167,9 @@ for step, (batch_x, batch_y) in enumerate(train_data.take(training_steps), 1):
 # %%
 # Test model on validation set.
 pred = neural_net(x_test, is_training=False)
+test_acc_v = float(accuracy(pred, y_test))  # Read in the timed region, so waiting for queued GPU work is counted; only the print is skipped.
 print_time = timeit.default_timer()
-print("Test Accuracy: %f" % accuracy(pred, y_test))
+print("Test Accuracy: %f" % test_acc_v)
 skipped_time += timeit.default_timer() - print_time
 
 # %%

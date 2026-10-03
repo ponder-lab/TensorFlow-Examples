@@ -81,8 +81,9 @@ for step in range(1, training_steps + 1):
         loss = mean_square(pred, Y)
         total_loss += loss
         loss_count += 1
+        loss_v, W_v, b_v = float(loss), W.numpy(), b.numpy()  # Read in the timed region, so waiting for queued GPU work is counted; only the print is skipped.
         print_time = timeit.default_timer()
-        print("step: %i, loss: %f, W: %f, b: %f" % (step, loss, W.numpy(), b.numpy()))
+        print("step: %i, loss: %f, W: %f, b: %f" % (step, loss_v, W_v, b_v))
         skipped_time += timeit.default_timer() - print_time
 
 time = timeit.default_timer() - start_time - skipped_time

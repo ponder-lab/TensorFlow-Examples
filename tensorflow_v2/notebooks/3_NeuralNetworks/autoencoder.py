@@ -157,8 +157,9 @@ for step, (batch_x, _) in enumerate(train_data.take(training_steps + 1)):
     loss_count += 1
 
     if step % display_step == 0:
+        loss_v = float(loss)  # Read in the timed region, so waiting for queued GPU work is counted; only the print is skipped.
         print_time = timeit.default_timer()
-        print("step: %i, loss: %f" % (step, loss))
+        print("step: %i, loss: %f" % (step, loss_v))
         skipped_time += timeit.default_timer() - print_time
 
 # %%
@@ -173,6 +174,7 @@ canvas_recon = np.empty((28 * n, 28 * n))
 for i, (batch_x, _) in enumerate(test_data.take(n)):
     # Encode and decode the digit image.
     reconstructed_images = decoder(encoder(batch_x))
+    reconstructed_images.numpy()  # Wait for the forward pass in the timed region; only the drawing below is skipped.
     # Display original images.
     viz_time = timeit.default_timer()
     for j in range(n):

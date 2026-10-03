@@ -210,8 +210,9 @@ for step, (batch_x, _) in enumerate(train_data.take(training_steps + 1)):
         disc_loss = discriminator_loss(discriminator(batch_x), discriminator(generator(noise)))
         total_disc_loss += disc_loss
         disc_loss_count += 1
+        gen_loss_v, disc_loss_v = float(gen_loss), float(disc_loss)  # Read in the timed region, so waiting for queued GPU work is counted; only the print is skipped.
         print_time = timeit.default_timer()
-        print("initial: gen_loss: %f, disc_loss: %f" % (gen_loss, disc_loss))
+        print("initial: gen_loss: %f, disc_loss: %f" % (gen_loss_v, disc_loss_v))
         skipped_time += timeit.default_timer() - print_time
         continue
 
@@ -223,8 +224,9 @@ for step, (batch_x, _) in enumerate(train_data.take(training_steps + 1)):
     disc_loss_count += 1
 
     if step % display_step == 0:
+        gen_loss_v, disc_loss_v = float(gen_loss), float(disc_loss)  # Read in the timed region, so waiting for queued GPU work is counted; only the print is skipped.
         print_time = timeit.default_timer()
-        print("step: %i, gen_loss: %f, disc_loss: %f" % (step, gen_loss, disc_loss))
+        print("step: %i, gen_loss: %f, disc_loss: %f" % (step, gen_loss_v, disc_loss_v))
         skipped_time += timeit.default_timer() - print_time
 
 time = timeit.default_timer() - start_time - skipped_time

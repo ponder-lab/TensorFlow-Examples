@@ -122,8 +122,9 @@ for step, (batch_x, batch_y) in enumerate(train_data.take(training_steps), 1):
         acc = accuracy(pred, batch_y)
         accuracy_count += 1
         total_accuracy += acc
+        loss_v, acc_v = float(loss), float(acc)  # Read in the timed region, so waiting for queued GPU work is counted; only the print is skipped.
         print_time = timeit.default_timer()
-        print("step: %i, loss: %f, accuracy: %f" % (step, loss, acc))
+        print("step: %i, loss: %f, accuracy: %f" % (step, loss_v, acc_v))
         skipped_time += timeit.default_timer() - print_time
 
 # %%
@@ -265,8 +266,9 @@ for step, (batch_x, batch_y) in enumerate(train_data.take(training_steps), 1):
         acc = accuracy(pred, batch_y)
         total_accuracy += acc
         accuracy_count += 1
+        loss_v, acc_v = float(loss), float(acc)  # Read in the timed region, so waiting for queued GPU work is counted; only the print is skipped.
         print_time = timeit.default_timer()
-        print("step: %i, loss: %f, accuracy: %f" % (step, loss, acc))
+        print("step: %i, loss: %f, accuracy: %f" % (step, loss_v, acc_v))
         skipped_time += timeit.default_timer() - print_time
 
 # %%
@@ -285,8 +287,9 @@ skipped_time += timeit.default_timer() - save_time
 neural_net = NeuralNet()
 # Test model performance.
 pred = neural_net(batch_x)
+acc_v = float(accuracy(pred, batch_y))  # Read in the timed region, so waiting for queued GPU work is counted; only the print is skipped.
 print_time = timeit.default_timer()
-print("accuracy: %f" % accuracy(pred, batch_y))
+print("accuracy: %f" % acc_v)
 skipped_time += timeit.default_timer() - print_time
 
 # %%
@@ -298,8 +301,9 @@ skipped_time += timeit.default_timer() - load_time
 # %%
 # Test that weights loaded correctly.
 pred = neural_net(batch_x)
+acc_v = float(accuracy(pred, batch_y))  # Read in the timed region, so waiting for queued GPU work is counted; only the print is skipped.
 print_time = timeit.default_timer()
-print("accuracy: %f" % accuracy(pred, batch_y))
+print("accuracy: %f" % acc_v)
 skipped_time += timeit.default_timer() - print_time
 
 time = timeit.default_timer() - start_time - skipped_time

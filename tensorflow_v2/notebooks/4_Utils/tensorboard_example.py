@@ -183,8 +183,9 @@ for step, (batch_x, batch_y) in enumerate(train_data.take(training_steps), 1):
         acc = accuracy(pred, batch_y)
         total_accuracy += acc
         accuracy_count += 1
+        loss_v, acc_v = float(loss), float(acc)  # Read in the timed region, so waiting for queued GPU work is counted; only the print is skipped.
         print_time = timeit.default_timer()
-        print("step: %i, loss: %f, accuracy: %f" % (step, loss, acc))
+        print("step: %i, loss: %f, accuracy: %f" % (step, loss_v, acc_v))
         skipped_time += timeit.default_timer() - print_time
 
         # Write loss/acc metrics & weights to Tensorboard every few steps,
