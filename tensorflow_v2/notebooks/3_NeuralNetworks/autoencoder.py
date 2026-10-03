@@ -157,9 +157,7 @@ for step, (batch_x, _) in enumerate(train_data.take(training_steps + 1)):
     loss_count += 1
 
     if step % display_step == 0:
-        print_time = timeit.default_timer()
         print("step: %i, loss: %f" % (step, loss))
-        skipped_time += timeit.default_timer() - print_time
 
 # %%
 # Testing and Visualization.

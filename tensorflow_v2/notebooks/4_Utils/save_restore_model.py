@@ -122,9 +122,7 @@ for step, (batch_x, batch_y) in enumerate(train_data.take(training_steps), 1):
         acc = accuracy(pred, batch_y)
         accuracy_count += 1
         total_accuracy += acc
-        print_time = timeit.default_timer()
         print("step: %i, loss: %f, accuracy: %f" % (step, loss, acc))
-        skipped_time += timeit.default_timer() - print_time
 
 # %%
 """
@@ -265,9 +263,7 @@ for step, (batch_x, batch_y) in enumerate(train_data.take(training_steps), 1):
         acc = accuracy(pred, batch_y)
         total_accuracy += acc
         accuracy_count += 1
-        print_time = timeit.default_timer()
         print("step: %i, loss: %f, accuracy: %f" % (step, loss, acc))
-        skipped_time += timeit.default_timer() - print_time
 
 # %%
 """
@@ -285,9 +281,7 @@ skipped_time += timeit.default_timer() - save_time
 neural_net = NeuralNet()
 # Test model performance.
 pred = neural_net(batch_x)
-print_time = timeit.default_timer()
 print("accuracy: %f" % accuracy(pred, batch_y))
-skipped_time += timeit.default_timer() - print_time
 
 # %%
 # Load saved weights.
@@ -298,9 +292,7 @@ skipped_time += timeit.default_timer() - load_time
 # %%
 # Test that weights loaded correctly.
 pred = neural_net(batch_x)
-print_time = timeit.default_timer()
 print("accuracy: %f" % accuracy(pred, batch_y))
-skipped_time += timeit.default_timer() - print_time
 
 time = timeit.default_timer() - start_time - skipped_time
 avg_loss = float(total_loss) / float(loss_count)
