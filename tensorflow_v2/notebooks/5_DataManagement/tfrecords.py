@@ -100,8 +100,7 @@ def convert_to_tfexample(survived, pclass, name, sex, age, sibsp, parch, ticket,
 # %%
 # Open dataset file.
 with open("titanic_dataset.csv") as f:
-    # Output TFRecord file. Opening and closing it, and each write, are skipped in the timing; building
-    # and serializing each Example stay timed.
+    # Output TFRecord file.
     writer_time = timeit.default_timer()
     with tf.io.TFRecordWriter("titanic_dataset.tfrecord") as w:
         skipped_time += timeit.default_timer() - writer_time
@@ -116,10 +115,7 @@ with open("titanic_dataset.csv") as f:
             # Parse each csv row to TF Example using the above functions.
             example = convert_to_tfexample(int(survived), int(pclass), name, sex, float(age), int(sibsp), int(parch), ticket, float(fare))
             # Serialize each TF Example to string, and write to TFRecord file.
-            serialized = example.SerializeToString()
-            write_time = timeit.default_timer()
-            w.write(serialized)
-            skipped_time += timeit.default_timer() - write_time
+            w.write(example.SerializeToString())
         writer_time = timeit.default_timer()
     skipped_time += timeit.default_timer() - writer_time
 
