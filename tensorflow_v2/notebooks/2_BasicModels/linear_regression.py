@@ -82,9 +82,7 @@ for step in range(1, training_steps + 1):
         loss = mean_square(pred, Y)
         total_loss += loss
         loss_count += 1
-        print_time = timeit.default_timer()
         print("step: %i, loss: %f, W: %f, b: %f" % (step, loss, W.numpy(), b.numpy()))
-        skipped_time += timeit.default_timer() - print_time
 
 time = timeit.default_timer() - start_time - skipped_time
 avg_loss = float(total_loss) / float(loss_count)

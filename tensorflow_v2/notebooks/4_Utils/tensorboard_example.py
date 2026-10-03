@@ -186,9 +186,7 @@ for step, (batch_x, batch_y) in enumerate(train_data.take(training_steps), 1):
         acc = accuracy(pred, batch_y)
         total_accuracy += acc
         accuracy_count += 1
-        print_time = timeit.default_timer()
         print("step: %i, loss: %f, accuracy: %f" % (step, loss, acc))
-        skipped_time += timeit.default_timer() - print_time
 
         # Write loss/acc metrics & weights to Tensorboard every few steps,
         # to avoid storing too much data.
