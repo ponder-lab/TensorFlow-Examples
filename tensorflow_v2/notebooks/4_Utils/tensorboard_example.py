@@ -75,7 +75,7 @@ biases = {
 # Tensorboard's Graph visualization more convenient.
 
 # The computation graph to be traced.
-@tf.function(input_signature=[tf.TensorSpec(shape=(256, 784), dtype=tf.float32)])
+@tf.function(reduce_retracing=True)
 def neural_net(x):
     with tf.name_scope('Model'):
         with tf.name_scope('HiddenLayer1'):
@@ -97,7 +97,7 @@ def neural_net(x):
 
 # %%
 # Cross-Entropy loss function.
-@tf.function(input_signature=[tf.TensorSpec(shape=(256, 10), dtype=tf.float32), tf.TensorSpec(shape=(256,), dtype=tf.uint8)])
+@tf.function(reduce_retracing=True)
 def cross_entropy(y_pred, y_true):
     with tf.name_scope('CrossEntropyLoss'):
         # Encode label to a one hot vector.
@@ -108,7 +108,7 @@ def cross_entropy(y_pred, y_true):
         return tf.reduce_mean(-tf.reduce_sum(y_true * tf.math.log(y_pred)))
 
 # Accuracy metric.
-@tf.function(input_signature=[tf.TensorSpec(shape=(256, 10), dtype=tf.float32), tf.TensorSpec(shape=(256,), dtype=tf.uint8)])
+@tf.function(reduce_retracing=True)
 def accuracy(y_pred, y_true):
     with tf.name_scope('Accuracy'):
         # Predicted class is the index of highest score in prediction vector (i.e. argmax).
@@ -121,7 +121,7 @@ with tf.name_scope('Optimizer'):
 
 # %%
 # Optimization process.
-@tf.function(input_signature=[tf.TensorSpec(shape=(256, 784), dtype=tf.float32), tf.TensorSpec(shape=(256,), dtype=tf.uint8)])
+@tf.function(reduce_retracing=True)
 def run_optimization(x, y):
     # Wrap computation inside a GradientTape for automatic differentiation.
     with tf.GradientTape() as g:

@@ -104,7 +104,7 @@ neural_net = NeuralNet()
 # %%
 # Cross-Entropy Loss.
 # Note that this will apply 'softmax' to the logits.
-@tf.function(input_signature=[tf.TensorSpec(shape=(256, 10), dtype=tf.float32), tf.TensorSpec(shape=(256,), dtype=tf.uint8)])
+@tf.function(reduce_retracing=True)
 def cross_entropy_loss(x, y):
     # Convert labels to int 64 for tf cross-entropy function.
     y = tf.cast(y, tf.int64)
@@ -114,7 +114,7 @@ def cross_entropy_loss(x, y):
     return tf.reduce_mean(loss)
 
 # Accuracy metric.
-@tf.function(input_signature=[tf.TensorSpec(shape=(None, 10), dtype=tf.float32), tf.TensorSpec(shape=(None,), dtype=tf.uint8)])
+@tf.function(reduce_retracing=True)
 def accuracy(y_pred, y_true):
     # Predicted class is the index of highest score in prediction vector (i.e. argmax).
     correct_prediction = tf.equal(tf.argmax(y_pred, 1), tf.cast(y_true, tf.int64))
@@ -125,7 +125,7 @@ optimizer = tf.optimizers.SGD(learning_rate)
 
 # %%
 # Optimization process.
-@tf.function(input_signature=[tf.TensorSpec(shape=(256, 784), dtype=tf.float32), tf.TensorSpec(shape=(256,), dtype=tf.uint8)])
+@tf.function(reduce_retracing=True)
 def run_optimization(x, y):
     # Wrap computation inside a GradientTape for automatic differentiation.
     with tf.GradientTape() as g:

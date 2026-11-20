@@ -76,7 +76,7 @@ class CustomLayer1(layers.Layer):
         # Make sure to call the `build` method at the end
         super(CustomLayer1, self).build(input_shape)
 
-    @tf.function(input_signature=[tf.TensorSpec(shape=(256, 784), dtype=tf.float32)])
+    @tf.function(reduce_retracing=True)
     def call(self, inputs):
         x = tf.matmul(inputs, self.weight)
         x = x + self.bias
@@ -113,7 +113,7 @@ class CustomLayer2(layers.Layer):
         # Make sure to call the `build` method at the end
         super(CustomLayer2, self).build(input_shape)
 
-    @tf.function(input_signature=[tf.TensorSpec(shape=(256, 64), dtype=tf.float32)])
+    @tf.function(reduce_retracing=True)
     def call(self, inputs):
         x = self.inner_layer1(inputs)
         x = tf.nn.relu(x)
@@ -161,14 +161,14 @@ custom_net = CustomNet()
 
 # %%
 # Cross-Entropy loss function.
-@tf.function(input_signature=[tf.TensorSpec(shape=(256, 64), dtype=tf.float32), tf.TensorSpec(shape=(256,), dtype=tf.uint8)])
+@tf.function(reduce_retracing=True)
 def cross_entropy(y_pred, y_true):
     y_true = tf.cast(y_true, tf.int64)
     crossentropy = tf.nn.sparse_softmax_cross_entropy_with_logits(labels=y_true, logits=y_pred)
     return tf.reduce_mean(crossentropy)
 
 # Accuracy metric.
-@tf.function(input_signature=[tf.TensorSpec(shape=(256, 64), dtype=tf.float32), tf.TensorSpec(shape=(256,), dtype=tf.uint8)])
+@tf.function(reduce_retracing=True)
 def accuracy(y_pred, y_true):
     # Predicted class is the index of highest score in prediction vector (i.e. argmax).
     correct_prediction = tf.equal(tf.argmax(y_pred, 1), tf.cast(y_true, tf.int64))
@@ -179,7 +179,7 @@ optimizer = tf.optimizers.Adam(learning_rate)
 
 # %%
 # Optimization process.
-@tf.function(input_signature=[tf.TensorSpec(shape=(256, 784), dtype=tf.float32), tf.TensorSpec(shape=(256,), dtype=tf.uint8)])
+@tf.function(reduce_retracing=True)
 def run_optimization(x, y):
     # Wrap computation inside a GradientTape for automatic differentiation.
     with tf.GradientTape() as g:
