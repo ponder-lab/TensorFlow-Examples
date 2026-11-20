@@ -157,6 +157,7 @@ PIL.Image.fromarray(transformed_img)
 
 # %%
 # Resize transformed image to a 256x256px square image, ready for training.
+@tf.function(input_signature=[tf.TensorSpec(shape=(None, None, 3), dtype=tf.uint8)])
 def resize_image(image):
     image = tf.image.resize(image, size=(256, 256), preserve_aspect_ratio=False)
     image = tf.cast(image, tf.uint8)
