@@ -1,4 +1,3 @@
-from __future__ import absolute_import, division, print_function
 # %%
 """
 # Convolutional Neural Network Example
@@ -19,7 +18,7 @@ This example is using a low-level approach to better understand all mechanics be
 
 ## MNIST Dataset Overview
 
-This example is using MNIST handwritten digits. The dataset contains 60,000 examples for training and 10,000 examples for testing. The digits have been size-normalized and centered in a fixed-size image (28x28 pixels) with values from 0 to 255.
+This example is using MNIST handwritten digits. The dataset contains 60,000 examples for training and 10,000 examples for testing. The digits have been size-normalized and centered in a fixed-size image (28x28 pixels) with values from 0 to 255. 
 
 In this example, each image will be converted to float32 and normalized to [0, 1].
 
@@ -29,6 +28,7 @@ More info: http://yann.lecun.com/exdb/mnist/
 """
 
 # %%
+
 
 import tensorflow as tf
 import numpy as np
@@ -101,25 +101,25 @@ biases = {
 # %%
 # Create model
 def conv_net(x):
-
+    
     # Input shape: [-1, 28, 28, 1]. A batch of 28x28x1 (grayscale) images.
     x = tf.reshape(x, [-1, 28, 28, 1])
 
     # Convolution Layer. Output shape: [-1, 28, 28, 32].
     conv1 = conv2d(x, weights['wc1'], biases['bc1'])
-
+    
     # Max Pooling (down-sampling). Output shape: [-1, 14, 14, 32].
     conv1 = maxpool2d(conv1, k=2)
 
     # Convolution Layer. Output shape: [-1, 14, 14, 64].
     conv2 = conv2d(conv1, weights['wc2'], biases['bc2'])
-
+    
     # Max Pooling (down-sampling). Output shape: [-1, 7, 7, 64].
     conv2 = maxpool2d(conv2, k=2)
 
     # Reshape conv2 output to fit fully connected layer input, Output shape: [-1, 7*7*64].
     fc1 = tf.reshape(conv2, [-1, weights['wd1'].get_shape().as_list()[0]])
-
+    
     # Fully connected layer, Output shape: [-1, 1024].
     fc1 = tf.add(tf.matmul(fc1, weights['wd1']), biases['bd1'])
     # Apply ReLU to fc1 output for non-linearity.
@@ -150,38 +150,38 @@ def accuracy(y_pred, y_true):
 optimizer = tf.optimizers.Adam(learning_rate)
 
 # %%
-# Optimization process.
+# Optimization process. 
 def run_optimization(x, y):
     # Wrap computation inside a GradientTape for automatic differentiation.
     with tf.GradientTape() as g:
         pred = conv_net(x)
         loss = cross_entropy(pred, y)
-
+        
     # Variables to update, i.e. trainable variables.
     trainable_variables = list(weights.values()) + list(biases.values())
 
     # Compute gradients.
     gradients = g.gradient(loss, trainable_variables)
-
+    
     # Update W and b following gradients.
-    optimizer.apply_gradients(zip(gradients, trainable_variables))
+    optimizer.apply_gradients(list(zip(gradients, trainable_variables)))
 
 # %%
 # Run training for the given number of steps.
 for step, (batch_x, batch_y) in enumerate(train_data.take(training_steps), 1):
     # Run the optimization to update W and b values.
     run_optimization(batch_x, batch_y)
-
+    
     if step % display_step == 0:
         pred = conv_net(batch_x)
         loss = cross_entropy(pred, batch_y)
         acc = accuracy(pred, batch_y)
-        print("step: %i, loss: %f, accuracy: %f" % (step, loss, acc))
+        print(("step: %i, loss: %f, accuracy: %f" % (step, loss, acc)))
 
 # %%
 # Test model on validation set.
 pred = conv_net(x_test)
-print("Test Accuracy: %f" % accuracy(pred, y_test))
+print(("Test Accuracy: %f" % accuracy(pred, y_test)))
 
 # %%
 # Visualize predictions.
@@ -197,4 +197,4 @@ predictions = conv_net(test_images)
 for i in range(n_images):
     plt.imshow(np.reshape(test_images[i], [28, 28]), cmap='gray')
     plt.show()
-    print("Model prediction: %i" % np.argmax(predictions.numpy()[i]))
+    print(("Model prediction: %i" % np.argmax(predictions.numpy()[i])))
