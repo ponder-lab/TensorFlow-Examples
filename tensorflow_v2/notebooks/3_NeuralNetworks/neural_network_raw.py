@@ -1,4 +1,3 @@
-from __future__ import absolute_import, division, print_function
 # %%
 """
 # Neural Network Example
@@ -19,7 +18,7 @@ This example is using a low-level approach to better understand all mechanics be
 
 ## MNIST Dataset Overview
 
-This example is using MNIST handwritten digits. The dataset contains 60,000 examples for training and 10,000 examples for testing. The digits have been size-normalized and centered in a fixed-size image (28x28 pixels) with values from 0 to 255.
+This example is using MNIST handwritten digits. The dataset contains 60,000 examples for training and 10,000 examples for testing. The digits have been size-normalized and centered in a fixed-size image (28x28 pixels) with values from 0 to 255. 
 
 In this example, each image will be converted to float32, normalized to [0, 1] and flattened to a 1-D array of 784 features (28*28).
 
@@ -29,6 +28,7 @@ More info: http://yann.lecun.com/exdb/mnist/
 """
 
 # %%
+
 
 import tensorflow as tf
 import numpy as np
@@ -88,12 +88,12 @@ def neural_net(x):
     layer_1 = tf.add(tf.matmul(x, weights['h1']), biases['b1'])
     # Apply sigmoid to layer_1 output for non-linearity.
     layer_1 = tf.nn.sigmoid(layer_1)
-
+    
     # Hidden fully connected layer with 256 neurons.
     layer_2 = tf.add(tf.matmul(layer_1, weights['h2']), biases['b2'])
     # Apply sigmoid to layer_2 output for non-linearity.
     layer_2 = tf.nn.sigmoid(layer_2)
-
+    
     # Output fully connected layer with a neuron for each class.
     out_layer = tf.matmul(layer_2, weights['out']) + biases['out']
     # Apply softmax to normalize the logits to a probability distribution.
@@ -119,38 +119,38 @@ def accuracy(y_pred, y_true):
 optimizer = tf.optimizers.SGD(learning_rate)
 
 # %%
-# Optimization process.
+# Optimization process. 
 def run_optimization(x, y):
     # Wrap computation inside a GradientTape for automatic differentiation.
     with tf.GradientTape() as g:
         pred = neural_net(x)
         loss = cross_entropy(pred, y)
-
+        
     # Variables to update, i.e. trainable variables.
     trainable_variables = list(weights.values()) + list(biases.values())
 
     # Compute gradients.
     gradients = g.gradient(loss, trainable_variables)
-
+    
     # Update W and b following gradients.
-    optimizer.apply_gradients(zip(gradients, trainable_variables))
+    optimizer.apply_gradients(list(zip(gradients, trainable_variables)))
 
 # %%
 # Run training for the given number of steps.
 for step, (batch_x, batch_y) in enumerate(train_data.take(training_steps), 1):
     # Run the optimization to update W and b values.
     run_optimization(batch_x, batch_y)
-
+    
     if step % display_step == 0:
         pred = neural_net(batch_x)
         loss = cross_entropy(pred, batch_y)
         acc = accuracy(pred, batch_y)
-        print("step: %i, loss: %f, accuracy: %f" % (step, loss, acc))
+        print(("step: %i, loss: %f, accuracy: %f" % (step, loss, acc)))
 
 # %%
 # Test model on validation set.
 pred = neural_net(x_test)
-print("Test Accuracy: %f" % accuracy(pred, y_test))
+print(("Test Accuracy: %f" % accuracy(pred, y_test)))
 
 # %%
 # Visualize predictions.
@@ -166,7 +166,6 @@ predictions = neural_net(test_images)
 for i in range(n_images):
     plt.imshow(np.reshape(test_images[i], [28, 28]), cmap='gray')
     plt.show()
-    print("Model prediction: %i" % np.argmax(predictions.numpy()[i]))
+    print(("Model prediction: %i" % np.argmax(predictions.numpy()[i])))
 
 # %%
-
